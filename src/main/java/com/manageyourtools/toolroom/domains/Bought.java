@@ -23,13 +23,18 @@ public class Bought {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(mappedBy = "bought")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bought")
     private List<BoughtTool> boughtToolList = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 
     private String description;
 
-
+    public Bought addBoughtTool(BoughtTool boughtTool){
+        boughtTool.setBought(this);
+        this.boughtToolList.add(boughtTool);
+        return this;
+    }
 }

@@ -1,6 +1,8 @@
 package com.manageyourtools.toolroom.domains;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -20,14 +22,23 @@ public class Employee {
 
     @NotNull
     private String firstName;
+
     @NotNull
-    private String surnameName;
+    @Column(unique = true)
+    private String userName;
+
+    @NotNull
+    private String surName;
 
     @Lob
     private String image;
 
-    @NotNull
-    private Role role;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "employee_role",
+            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName="id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName="id"))
+    private Set<Role> roles = new HashSet<>();
 
     @NotNull
     private Boolean isActive;
@@ -37,13 +48,20 @@ public class Employee {
     //make it as next table
     private String workingGroup;
 
-    @Size(min = 9, max = 9)
+
     private Long phoneNumber;
 
+    @NotNull
     private String password;
 
     @Email
     private String email;
+
+    public void setPassword(String password){
+
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        this.password = bCryptPasswordEncoder.encode(password);
+    }
 
 
 }

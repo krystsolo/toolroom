@@ -23,11 +23,18 @@ public class Destroyed {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(mappedBy = "bought")
-    private List<BoughtTool> boughtToolList = new ArrayList<>();
+    @OneToMany(mappedBy = "destroyed")
+    private List<DestroyedTool> destroyedTools = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 
     private String description;
+
+    public Destroyed addDestroyedTool(DestroyedTool destroyedTool){
+        destroyedTool.setDestroyed(this);
+        this.destroyedTools.add(destroyedTool);
+        return this;
+    }
 }

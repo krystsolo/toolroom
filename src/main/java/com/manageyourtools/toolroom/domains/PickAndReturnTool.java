@@ -17,14 +17,15 @@ public class PickAndReturnTool {
 
     private Boolean isReturned;
 
-    @OneToOne
-    private Employee warehouseman;
+    @ManyToOne
+    @JoinColumn(name = "returnWarehouseman_id")
+    private Employee returnWarehouseman;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "pickAndReturn_id")
     private PickAndReturn pickAndReturn;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "tool_id")
     private Tool tool;
 }

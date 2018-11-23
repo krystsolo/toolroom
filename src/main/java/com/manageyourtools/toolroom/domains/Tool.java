@@ -22,6 +22,8 @@ public class Tool {
     private String name;
 
     private Long currentCount;
+
+    @Enumerated(value = EnumType.STRING)
     private UnitOfMeasure unitOfMeasure;
     private Long allCount;
 
@@ -44,10 +46,30 @@ public class Tool {
     @Lob
     private String image;
 
-    @OneToMany(mappedBy = "tool")
-    private List<BoughtTool> boughtTools = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tool")
+    private List<BoughtTool> boughtTools;
 
-    //private DestroyedTool destroyedTool;
-    //private PickAndReturnTool pickAndReturnTool;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tool")
+    private List<DestroyedTool> destroyedTools;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tool")
+    private List<PickAndReturnTool> pickAndReturnTools;
+
+    public Tool addBoughtTool(BoughtTool boughtTool){
+        boughtTool.setTool(this);
+        this.boughtTools.add(boughtTool);
+        return this;
+    }
+
+    public Tool addDestroyedTool(DestroyedTool destroyedTool){
+        destroyedTool.setTool(this);
+        this.destroyedTools.add(destroyedTool);
+        return this;
+    }
+
+    public Tool addPickAndReturnTool(PickAndReturnTool pickAndReturnTool){
+        pickAndReturnTool.setTool(this);
+        this.pickAndReturnTools.add(pickAndReturnTool);
+        return this;
+    }
 }

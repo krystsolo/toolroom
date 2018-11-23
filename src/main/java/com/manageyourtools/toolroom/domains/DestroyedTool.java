@@ -16,11 +16,11 @@ public class DestroyedTool {
 
     private String description;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "pickAndReturn_id")
-    private PickAndReturn pickAndReturn;
+    @ManyToOne
+    @JoinColumn(name = "destroyed_id")
+    private Destroyed destroyed;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "tool_id")
     private Tool tool;
 }

@@ -21,16 +21,18 @@ public class PickAndReturn {
     private Timestamp pickTime;
 
     @OneToMany(mappedBy = "pickAndReturn")
-    private List<PickAndReturnTool> pickAndReturn = new ArrayList<>();
+    private List<PickAndReturnTool> pickAndReturnTools = new ArrayList<>();
 
     private Boolean isToReturn;
 
     private Timestamp returnUntilTime;
 
-    @OneToOne
-    private Employee warehouseman;
+    @ManyToOne
+    @JoinColumn(name = "pickWarehouseman_id")
+    private Employee pickWarehouseman;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "worker_id")
     private Employee worker;
 
     private String orderNumber;
@@ -43,4 +45,14 @@ public class PickAndReturn {
     private String description;
 
     private Timestamp returnTime;
+
+    @ManyToOne
+    @JoinColumn(name = "returnWarehouseman_id")
+    private Employee returnWarehouseman;
+
+    public PickAndReturn addPickAndReturnTool(PickAndReturnTool pickAndReturnTool){
+        pickAndReturnTool.setPickAndReturn(this);
+        this.pickAndReturnTools.add(pickAndReturnTool);
+        return this;
+    }
 }

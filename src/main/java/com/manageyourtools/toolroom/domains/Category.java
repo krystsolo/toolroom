@@ -17,7 +17,9 @@ public class Category {
     private Long id;
 
     @NotNull
-    @NotBlank
+    @Column(unique = true)
+    private String name;
+
     @ManyToMany(mappedBy = "categories")
     private List<Tool> tools;
 
