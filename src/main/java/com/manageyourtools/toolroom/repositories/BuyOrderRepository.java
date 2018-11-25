@@ -1,11 +1,10 @@
 package com.manageyourtools.toolroom.repositories;
 
-import com.manageyourtools.toolroom.domains.Employee;
+import com.manageyourtools.toolroom.domains.BuyOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    Employee findByUserName(String userName);
+public interface BuyOrderRepository extends JpaRepository<BuyOrder, Long> {
+
 }

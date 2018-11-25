@@ -28,7 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
            throw new RuntimeException("employee with username: " + username + " not found");
         }
 
-        System.out.println(employee.getRoles().toString());
         return new User(
                 employee.getUserName(),
                 employee.getPassword(),

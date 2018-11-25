@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
-
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
@@ -34,8 +33,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.userDetailsService(detailsService)
-        .passwordEncoder(passwordEncoder());
+        builder
+                .userDetailsService(detailsService)
+                .passwordEncoder(passwordEncoder());
 
     }
 
@@ -45,11 +45,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .anyRequest().authenticated()
-                .antMatchers("/**").hasAnyRole("ADMIN", "WORKER")
                 .and()
                 .httpBasic()
                 .realmName("REALM")
-                .authenticationEntryPoint(customAuthenticationEntryPoint);;
+                .authenticationEntryPoint(customAuthenticationEntryPoint);
+        ;
+
+        //configuration to allow start h2-console in browser
+        //to delete in production
+        http
+                .authorizeRequests()
+                .antMatchers("/console/**").permitAll()
+                .antMatchers("/").permitAll()
+                .and()
+                .headers().frameOptions().disable();
+
     }
 
 }

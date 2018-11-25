@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.config.AuthenticationFacade;
 import com.manageyourtools.toolroom.controllers.assembler.EmployeeResourceAssembler;
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.services.EmployeeService;
@@ -17,10 +18,9 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-
     private final EmployeeResourceAssembler assembler;
 
-    public EmployeeController(EmployeeService employeeService, EmployeeResourceAssembler assembler) {
+    public EmployeeController(EmployeeService employeeService, EmployeeResourceAssembler assembler, AuthenticationFacade authenticationFacade) {
         this.employeeService = employeeService;
         this.assembler = assembler;
     }

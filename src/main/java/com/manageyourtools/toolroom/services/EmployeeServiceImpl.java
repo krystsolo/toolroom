@@ -1,9 +1,11 @@
 package com.manageyourtools.toolroom.services;
 
+import com.manageyourtools.toolroom.config.AuthenticationFacade;
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.repositories.EmployeeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,19 +14,21 @@ import java.util.Optional;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationFacade authenticationFacade) {
         this.employeeRepository = employeeRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
     public Employee getEmployeeById(Long id) {
+
         return employeeRepository.findById(id).orElseThrow(RuntimeException::new);//todo better error handling
     }
 
     @Override
     public Page<Employee> getEmployees(Pageable pageable) {
-        System.out.println("izi");
         return employeeRepository.findAll(pageable);
     }
 
@@ -50,6 +54,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee saveEmployee(Employee employee) {
+
+        employee.setPassword(bCryptPasswordEncoder.encode(employee.getPassword()));
+
         return employeeRepository.save(employee);
     }
 
@@ -75,7 +82,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
 
             if(employee.getPassword() != null){
-                updatedEmployee.setPassword(updatedEmployee.getPassword());
+                updatedEmployee.setPassword(bCryptPasswordEncoder.encode(updatedEmployee.getPassword()));
             }
 
             if(employee.getImage() != null){
@@ -96,10 +103,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             if(employee.getRoles() != null){
                 updatedEmployee.setRoles(updatedEmployee.getRoles());
-            }
-
-            if(employee.getHireDate() != null){
-                updatedEmployee.setHireDate(updatedEmployee.getHireDate());
             }
 
             return employeeRepository.save(updatedEmployee);

@@ -7,6 +7,7 @@ import com.manageyourtools.toolroom.repositories.RoleRepository;
 import com.manageyourtools.toolroom.repositories.ToolRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -19,13 +20,14 @@ public class ToolRoomBootstrap implements ApplicationListener<ContextRefreshedEv
     private final RoleRepository roleRepository;
     private final CategoryRepository categoryRepository;
     private final ToolRepository toolRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
-    public ToolRoomBootstrap(EmployeeRepository employeeRepository, RoleRepository roleRepository, CategoryRepository categoryRepository, ToolRepository toolRepository) {
+    public ToolRoomBootstrap(EmployeeRepository employeeRepository, RoleRepository roleRepository, CategoryRepository categoryRepository, ToolRepository toolRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.employeeRepository = employeeRepository;
         this.roleRepository = roleRepository;
         this.categoryRepository = categoryRepository;
         this.toolRepository = toolRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class ToolRoomBootstrap implements ApplicationListener<ContextRefreshedEv
 
         Employee employee1 = new Employee();
         employee1.setFirstName("Jan");
-        employee1.setPassword("123");
+        employee1.setPassword(bCryptPasswordEncoder.encode("123"));
         employee1.setUserName("pko");
         employee1.setSurName("kowalski");
         employee1.setPhoneNumber(Long.valueOf("999999999"));
@@ -67,7 +69,7 @@ public class ToolRoomBootstrap implements ApplicationListener<ContextRefreshedEv
 
         Employee employee2 = new Employee();
         employee2.setFirstName("Janek");
-        employee2.setPassword("LOL");
+        employee2.setPassword(bCryptPasswordEncoder.encode("LOL"));
         employee2.setUserName("pawel");
         employee2.setSurName("kowalski2");
         employee2.setPhoneNumber(Long.valueOf("999999999"));

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class PickAndReturn {
+public class LendingOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,18 +20,20 @@ public class PickAndReturn {
     @CreationTimestamp
     private Timestamp pickTime;
 
-    @OneToMany(mappedBy = "pickAndReturn")
-    private List<PickAndReturnTool> pickAndReturnTools = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lendingOrder")
+    private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
 
     private Boolean isToReturn;
 
     private Timestamp returnUntilTime;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "pickWarehouseman_id")
     private Employee pickWarehouseman;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "worker_id")
     private Employee worker;
 
@@ -46,13 +48,14 @@ public class PickAndReturn {
 
     private Timestamp returnTime;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "returnWarehouseman_id")
     private Employee returnWarehouseman;
 
-    public PickAndReturn addPickAndReturnTool(PickAndReturnTool pickAndReturnTool){
-        pickAndReturnTool.setPickAndReturn(this);
-        this.pickAndReturnTools.add(pickAndReturnTool);
+    public LendingOrder addPickAndReturnTool(LendingOrderTool lendingOrderTool){
+        lendingOrderTool.setLendingOrder(this);
+        this.lendingOrderTools.add(lendingOrderTool);
         return this;
     }
 }

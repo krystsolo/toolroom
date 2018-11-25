@@ -7,7 +7,7 @@ import javax.validation.constraints.Min;
 
 @Entity
 @Data
-public class BoughtTool {
+public class BuyOrderTool {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +20,8 @@ public class BoughtTool {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "bought_id")
-    private Bought bought;
+    @JoinColumn(name = "buyOrder_id")
+    private BuyOrder buyOrder;
 
     @Min(1)
     private Long count;

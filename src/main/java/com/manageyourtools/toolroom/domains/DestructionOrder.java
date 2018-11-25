@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class Destroyed {
+public class DestructionOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,18 +23,19 @@ public class Destroyed {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(mappedBy = "destroyed")
-    private List<DestroyedTool> destroyedTools = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "destructionOrder")
+    private List<DestructionOrderTool> destructionOrderTools = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 
     private String description;
 
-    public Destroyed addDestroyedTool(DestroyedTool destroyedTool){
-        destroyedTool.setDestroyed(this);
-        this.destroyedTools.add(destroyedTool);
+    public DestructionOrder addDestroyedTool(DestructionOrderTool destructionOrderTool){
+        destructionOrderTool.setDestructionOrder(this);
+        this.destructionOrderTools.add(destructionOrderTool);
         return this;
     }
 }

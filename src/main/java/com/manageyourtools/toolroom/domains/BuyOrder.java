@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class Bought {
+public class BuyOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,18 +23,19 @@ public class Bought {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bought")
-    private List<BoughtTool> boughtToolList = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "buyOrder")
+    private List<BuyOrderTool> buyOrderTools = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 
     private String description;
 
-    public Bought addBoughtTool(BoughtTool boughtTool){
-        boughtTool.setBought(this);
-        this.boughtToolList.add(boughtTool);
+    public BuyOrder addBoughtTool(BuyOrderTool buyOrderTool){
+        buyOrderTool.setBuyOrder(this);
+        this.buyOrderTools.add(buyOrderTool);
         return this;
     }
 }

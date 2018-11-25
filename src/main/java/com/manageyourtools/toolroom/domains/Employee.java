@@ -1,5 +1,8 @@
 package com.manageyourtools.toolroom.domains;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,8 +46,6 @@ public class Employee {
     @NotNull
     private Boolean isActive;
 
-    private LocalDate hireDate;
-
     //make it as next table
     private String workingGroup;
 
@@ -57,11 +58,9 @@ public class Employee {
     @Email
     private String email;
 
-    public void setPassword(String password){
-
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        this.password = bCryptPasswordEncoder.encode(password);
+    @JsonIgnore
+    public String getPassword() {
+        return password;
     }
-
 
 }
