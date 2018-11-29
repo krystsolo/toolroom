@@ -42,16 +42,11 @@ public class ToolRoomBootstrap implements ApplicationListener<ContextRefreshedEv
 
         List<Employee> employees = new ArrayList<>(2);
 
-        Role admin = new Role();
-        admin.setRoleType(RoleEnum.ADMIN);
-        Role worker = new Role();
-        worker.setRoleType(RoleEnum.EMPLOYEE);
-        Role warehouseman = new Role();
-        warehouseman.setRoleType(RoleEnum.WAREHOUSEMAN);
 
-        roleRepository.save(admin);
-        roleRepository.save(worker);
-        roleRepository.save(warehouseman);
+        Role admin = roleRepository.getOne(1L);
+        Role worker = roleRepository.getOne(2L);
+        Role warehouseman = roleRepository.getOne(3L);
+
 
         Employee employee1 = new Employee();
         employee1.setFirstName("Jan");

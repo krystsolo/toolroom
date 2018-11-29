@@ -1,6 +1,7 @@
 package com.manageyourtools.toolroom.domains;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +18,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    @Column(unique = true)
     @Enumerated(EnumType.STRING)
     private RoleEnum roleType;
 
