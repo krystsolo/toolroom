@@ -5,10 +5,11 @@ import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.repositories.EmployeeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_ADMIN;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -33,18 +34,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public void deleteEmployee(Long id) {
 
-        Optional<Employee> employeeOptional = employeeRepository.findById(id);
-
-        if(employeeOptional.isPresent()){
-            Employee employee = employeeOptional.get();
+        employeeRepository.findById(id).ifPresent(employee -> {
             employee.setIsActive(false);
             employeeRepository.save(employee);
-        }
+        });
+
     }
 
     @Override
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public Employee updateEmployee(Long id, Employee employee) {
 
         employee.setId(id);
@@ -53,6 +54,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public Employee saveEmployee(Employee employee) {
 
         employee.setPassword(bCryptPasswordEncoder.encode(employee.getPassword()));
@@ -61,48 +63,49 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public Employee patchEmployee(Long id, Employee employee) {
 
         return employeeRepository.findById(id).map(updatedEmployee -> {
 
             if(employee.getFirstName() != null){
-                updatedEmployee.setFirstName(updatedEmployee.getFirstName());
+                updatedEmployee.setFirstName(employee.getFirstName());
             }
 
             if(employee.getSurName() != null){
-                updatedEmployee.setSurName(updatedEmployee.getSurName());
+                updatedEmployee.setSurName(employee.getSurName());
             }
 
             if(employee.getUserName() != null){
-                updatedEmployee.setUserName(updatedEmployee.getUserName());
+                updatedEmployee.setUserName(employee.getUserName());
             }
 
             if(employee.getIsActive() != null){
-                updatedEmployee.setIsActive(updatedEmployee.getIsActive());
+                updatedEmployee.setIsActive(employee.getIsActive());
             }
 
             if(employee.getPassword() != null){
-                updatedEmployee.setPassword(bCryptPasswordEncoder.encode(updatedEmployee.getPassword()));
+                updatedEmployee.setPassword(bCryptPasswordEncoder.encode(employee.getPassword()));
             }
 
             if(employee.getImage() != null){
-                updatedEmployee.setImage(updatedEmployee.getImage());
+                updatedEmployee.setImage(employee.getImage());
             }
 
             if(employee.getPhoneNumber() != null){
-                updatedEmployee.setPhoneNumber(updatedEmployee.getPhoneNumber());
+                updatedEmployee.setPhoneNumber(employee.getPhoneNumber());
             }
 
             if(employee.getWorkingGroup() != null){
-                updatedEmployee.setWorkingGroup(updatedEmployee.getWorkingGroup());
+                updatedEmployee.setWorkingGroup(employee.getWorkingGroup());
             }
 
             if(employee.getEmail() != null){
-                updatedEmployee.setEmail(updatedEmployee.getEmail());
+                updatedEmployee.setEmail(employee.getEmail());
             }
 
             if(employee.getRoles() != null){
-                updatedEmployee.setRoles(updatedEmployee.getRoles());
+                updatedEmployee.setRoles(employee.getRoles());
             }
 
             return employeeRepository.save(updatedEmployee);

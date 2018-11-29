@@ -15,6 +15,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping("/employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -25,7 +26,7 @@ public class EmployeeController {
         this.assembler = assembler;
     }
 
-    @GetMapping("/employees/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Resource<Employee> getEmployee(@PathVariable Long id){
 
@@ -34,23 +35,17 @@ public class EmployeeController {
         return assembler.toResource(employee);
     }
 
-    @GetMapping("/employees")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<Resource<Employee>> getEmployees(Pageable pageable, PagedResourcesAssembler<Employee> pagedResourcesAssembler){
 
-        //Page<Resource<Employee>> resourcesPage = employeeService.getEmployees(pageable).map(assembler::toResource);
         return pagedResourcesAssembler.toResource(
                 employeeService.getEmployees(pageable),
                 assembler,
                 linkTo(methodOn(EmployeeController.class).getEmployees(pageable,pagedResourcesAssembler)).withSelfRel());
-//        return new PagedResources<>(resourcesPage.getContent(),
-//                new PagedResources.PageMetadata(
-//                        resourcesPage.getSize(), resourcesPage.getNumber(),
-//                        resourcesPage.getTotalElements(), resourcesPage.getTotalPages()),
-//                linkTo(methodOn(EmployeeController.class).getEmployees(pageable)).withSelfRel());
     }
 
-    @PostMapping("/employees")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public Resource<Employee> addEmployee(@RequestBody Employee employee){
 
@@ -59,7 +54,7 @@ public class EmployeeController {
 
     }
 
-    @PutMapping("/employees/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public Resource<Employee> updateEmployee(@RequestBody Employee employee, @PathVariable Long id){
 
@@ -67,14 +62,14 @@ public class EmployeeController {
 
     }
 
-    @DeleteMapping("/employees/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteEmployee(@PathVariable Long id){
 
         employeeService.deleteEmployee(id);
     }
 
-    @PatchMapping("/employees/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Resource<Employee> patchEmployee(@PathVariable Long id, @RequestBody Employee employee){
 
