@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleEnum roleType;
 
-    //@ManyToMany(mappedBy = "roles")
-    //private Set<Employee> employees;
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    private Set<Employee> employees;
 }

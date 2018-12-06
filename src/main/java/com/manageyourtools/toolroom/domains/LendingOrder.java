@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -21,6 +22,7 @@ public class LendingOrder {
     private Timestamp pickTime;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lendingOrder")
+    @JsonIgnore
     private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
 
     private Boolean isToReturn;

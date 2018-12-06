@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,6 +25,7 @@ public class DestructionOrder {
     private Timestamp editTimestamp;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "destructionOrder")
+    @JsonIgnore
     private List<DestructionOrderTool> destructionOrderTools = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,

@@ -1,5 +1,7 @@
 package com.manageyourtools.toolroom.domains;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,6 +23,7 @@ public class BuyOrderTool {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "buyOrder_id")
+    @JsonIgnore
     private BuyOrder buyOrder;
 
     @Min(1)

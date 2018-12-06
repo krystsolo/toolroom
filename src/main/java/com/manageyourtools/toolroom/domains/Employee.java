@@ -2,6 +2,9 @@ package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -11,10 +14,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Employee {
 
     @Id
@@ -44,9 +50,7 @@ public class Employee {
     @NotNull
     private Boolean isActive;
 
-    //make it as next table
     private String workingGroup;
-
 
     private Long phoneNumber;
 
@@ -55,10 +59,28 @@ public class Employee {
 
     @Email
     private String email;
-
+    
+    @OneToMany(mappedBy = "warehouseman")
     @JsonIgnore
-    public String getPassword() {
-        return password;
-    }
+    private List<BuyOrder> buyOrders;
 
+    @OneToMany(mappedBy = "warehouseman")
+    @JsonIgnore
+    private List<DestructionOrder> destructionOrders;
+
+    @OneToMany(mappedBy = "pickWarehouseman")
+    @JsonIgnore
+    private List<LendingOrder> lendingOrdersRentals;
+
+    @OneToMany(mappedBy = "worker")
+    @JsonIgnore
+    private List<LendingOrder> lendingOrdersDownloads;
+
+    @OneToMany(mappedBy = "returnWarehouseman")
+    @JsonIgnore
+    private List<LendingOrder> lendingOrdersReturns;
+
+    @OneToMany(mappedBy = "returnWarehouseman")
+    @JsonIgnore
+    private List<LendingOrder> lendingOrderToolReturns;
 }
