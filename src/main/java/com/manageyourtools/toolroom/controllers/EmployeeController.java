@@ -1,10 +1,12 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.api.model.EmployeeDTO;
 import com.manageyourtools.toolroom.config.AuthenticationFacade;
 import com.manageyourtools.toolroom.controllers.assembler.EmployeeResourceAssembler;
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.services.EmployeeService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
@@ -15,8 +17,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/employees")
+@RequestMapping(EmployeeController.BASE_URL)
 public class EmployeeController {
+
+    public static final String BASE_URL = "/employees";
 
     private final EmployeeService employeeService;
     private final EmployeeResourceAssembler assembler;
@@ -28,16 +32,16 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Resource<Employee> getEmployee(@PathVariable Long id){
+    public Resource<EmployeeDTO> getEmployee(@PathVariable Long id){
 
-        Employee employee = employeeService.getEmployeeById(id);
+        EmployeeDTO employeeDTO = employeeService.getEmployeeById(id);
 
-        return assembler.toResource(employee);
+        return assembler.toResource(employeeDTO);
     }
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<Resource<Employee>> getEmployees(Pageable pageable, PagedResourcesAssembler<Employee> pagedResourcesAssembler){
+    public PagedResources<Resource<EmployeeDTO>> getEmployees(@PageableDefault Pageable pageable, PagedResourcesAssembler<EmployeeDTO> pagedResourcesAssembler){
 
         return pagedResourcesAssembler.toResource(
                 employeeService.getEmployees(pageable),
@@ -47,32 +51,32 @@ public class EmployeeController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Employee> addEmployee(@RequestBody Employee employee){
+    public Resource<EmployeeDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO){
 
-        return assembler.toResource(employeeService.saveEmployee(employee));
+        return assembler.toResource(employeeService.saveEmployee(employeeDTO));
 
 
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Employee> updateEmployee(@RequestBody Employee employee, @PathVariable Long id){
+    public Resource<EmployeeDTO> updateEmployee(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long id){
 
-        return assembler.toResource(employeeService.updateEmployee(id, employee));
+        return assembler.toResource(employeeService.updateEmployee(id, employeeDTO));
 
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteEmployee(@PathVariable Long id){
+    public Resource<EmployeeDTO> deleteEmployee(@PathVariable Long id){
 
-        employeeService.deleteEmployee(id);
+        return assembler.toResource(employeeService.deleteEmployee(id));
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Resource<Employee> patchEmployee(@PathVariable Long id, @RequestBody Employee employee){
+    public Resource<EmployeeDTO> patchEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO){
 
-        return assembler.toResource(employeeService.patchEmployee(id, employee));
+        return assembler.toResource(employeeService.patchEmployee(id, employeeDTO));
     }
 }

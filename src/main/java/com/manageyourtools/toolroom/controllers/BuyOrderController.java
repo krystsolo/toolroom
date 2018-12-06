@@ -1,5 +1,7 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.api.mapper.BuyOrderMapper;
+import com.manageyourtools.toolroom.api.model.BuyOrderDTO;
 import com.manageyourtools.toolroom.controllers.assembler.BuyOrderResourceAssembler;
 import com.manageyourtools.toolroom.domains.BuyOrder;
 import com.manageyourtools.toolroom.services.BuyOrderService;
@@ -14,11 +16,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/buy")
+@RequestMapping("/buyorders")
 public class BuyOrderController {
 
     private final BuyOrderService buyOrderService;
-
     private final BuyOrderResourceAssembler assembler;
 
     public BuyOrderController(BuyOrderService buyOrderService, BuyOrderResourceAssembler assembler) {
@@ -28,51 +29,50 @@ public class BuyOrderController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Resource<BuyOrder> getBought(@PathVariable Long id){
+    public Resource<BuyOrderDTO> getBuyOrder(@PathVariable Long id){
 
-        BuyOrder buyOrder = buyOrderService.findBoughtById(id);
+        BuyOrderDTO buyOrderDTO = buyOrderService.findBuyOrderById(id);
 
-        return assembler.toResource(buyOrder);
+        return assembler.toResource(buyOrderDTO);
     }
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<Resource<BuyOrder>> getBoughts(Pageable pageable, PagedResourcesAssembler<BuyOrder> pagedResourcesAssembler){
-
+    public PagedResources<Resource<BuyOrderDTO>> getBuyOrders(Pageable pageable, PagedResourcesAssembler<BuyOrderDTO> pagedResourcesAssembler){
 
         return pagedResourcesAssembler.toResource(
-                buyOrderService.findAllBoughts(pageable),
+                buyOrderService.findAllBuyOrders(pageable),
                 assembler,
-                linkTo(methodOn(BuyOrderController.class).getBoughts(pageable,pagedResourcesAssembler)).withSelfRel());
+                linkTo(methodOn(BuyOrderController.class).getBuyOrders(pageable,pagedResourcesAssembler)).withSelfRel());
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<BuyOrder> addTool(@RequestBody BuyOrder buyOrder){
+    public Resource<BuyOrderDTO> addBuyOrder(@RequestBody BuyOrderDTO buyOrderDTO){
 
-        return assembler.toResource(buyOrderService.addBought(buyOrder));
+        return assembler.toResource(buyOrderService.addBuyOrder(buyOrderDTO));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<BuyOrder> updateBought(@RequestBody BuyOrder buyOrder, @PathVariable Long id) {
+    public Resource<BuyOrderDTO> updateBuyOrder(@RequestBody BuyOrderDTO buyOrderDTO, @PathVariable Long id) {
 
-        return assembler.toResource(buyOrderService.updateBought(id, buyOrder));
+        return assembler.toResource(buyOrderService.updateBuyOrder(id, buyOrderDTO));
 
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteBought(@PathVariable Long id){
+    public void deleteBuyOrder(@PathVariable Long id){
 
-        buyOrderService.deleteBought(id);
+        buyOrderService.deleteBuyOrder(id);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Resource<BuyOrder> patchTool(@PathVariable Long id, @RequestBody BuyOrder buyOrder) {
+    public Resource<BuyOrderDTO> patchBuyOrder(@PathVariable Long id, @RequestBody BuyOrderDTO buyOrderDTO) {
 
-        return assembler.toResource(buyOrderService.patchBought(id, buyOrder));
+        return assembler.toResource(buyOrderService.patchBuyOrder(id, buyOrderDTO));
     }
 
 }

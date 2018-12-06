@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.api.model.ToolDTO;
 import com.manageyourtools.toolroom.controllers.assembler.ToolResourceAssembler;
 import com.manageyourtools.toolroom.domains.Tool;
 import com.manageyourtools.toolroom.services.ToolService;
@@ -28,17 +29,16 @@ public class ToolController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Resource<Tool> getTool(@PathVariable Long id){
+    public Resource<ToolDTO> getTool(@PathVariable Long id){
 
-       Tool tool = toolService.findTool(id);
+        ToolDTO toolDTO = toolService.findTool(id);
 
-        return assembler.toResource(tool);
+        return assembler.toResource(toolDTO);
     }
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<Resource<Tool>> getTools(Pageable pageable, PagedResourcesAssembler<Tool> pagedResourcesAssembler){
-
+    public PagedResources<Resource<ToolDTO>> getTools(Pageable pageable, PagedResourcesAssembler<ToolDTO> pagedResourcesAssembler){
 
         return pagedResourcesAssembler.toResource(
                 toolService.findAllTools(pageable),
@@ -48,16 +48,16 @@ public class ToolController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Tool> addTool(@RequestBody Tool tool){
+    public Resource<ToolDTO> addTool(@RequestBody ToolDTO toolDTO){
 
-        return assembler.toResource(toolService.saveTool(tool));
+        return assembler.toResource(toolService.saveTool(toolDTO));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Tool> updateTool(@RequestBody Tool tool, @PathVariable Long id) {
+    public Resource<ToolDTO> updateTool(@RequestBody ToolDTO toolDTO, @PathVariable Long id) {
 
-        return assembler.toResource(toolService.updateTool(id, tool));
+        return assembler.toResource(toolService.updateTool(id, toolDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -69,8 +69,8 @@ public class ToolController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Resource<Tool> patchTool(@PathVariable Long id, @RequestBody Tool tool) {
+    public Resource<ToolDTO> patchTool(@PathVariable Long id, @RequestBody ToolDTO toolDTO) {
 
-        return assembler.toResource(toolService.patchTool(id, tool));
+        return assembler.toResource(toolService.patchTool(id, toolDTO));
     }
 }

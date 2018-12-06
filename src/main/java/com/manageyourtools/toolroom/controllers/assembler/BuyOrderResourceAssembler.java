@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers.assembler;
 
+import com.manageyourtools.toolroom.api.model.BuyOrderDTO;
 import com.manageyourtools.toolroom.controllers.BuyOrderController;
 import com.manageyourtools.toolroom.domains.BuyOrder;
 import org.springframework.data.domain.Pageable;
@@ -12,13 +13,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
-public class BuyOrderResourceAssembler implements ResourceAssembler<BuyOrder, Resource<BuyOrder>> {
+public class BuyOrderResourceAssembler implements ResourceAssembler<BuyOrderDTO, Resource<BuyOrderDTO>> {
 
     @Override
-    public Resource<BuyOrder> toResource(BuyOrder buyOrder) {
+    public Resource<BuyOrderDTO> toResource(BuyOrderDTO buyOrderDTO) {
 
-        return new Resource<>(buyOrder,
-                ControllerLinkBuilder.linkTo(methodOn(BuyOrderController.class).getBought(buyOrder.getId())).withSelfRel(),
-                linkTo(methodOn(BuyOrderController.class).getBoughts(Pageable.unpaged(),null)).withRel("buyOrders"));
+        return new Resource<>(buyOrderDTO,
+                ControllerLinkBuilder.linkTo(methodOn(BuyOrderController.class).getBuyOrder(buyOrderDTO.getId())).withSelfRel(),
+                linkTo(methodOn(BuyOrderController.class).getBuyOrders(Pageable.unpaged(),null)).withRel("buyOrders"));
     }
 }

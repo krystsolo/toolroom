@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers.assembler;
 
+import com.manageyourtools.toolroom.api.model.ToolDTO;
 import com.manageyourtools.toolroom.controllers.ToolController;
 import com.manageyourtools.toolroom.domains.Tool;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +14,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
-public class ToolResourceAssembler implements ResourceAssembler<Tool, Resource<Tool>> {
+public class ToolResourceAssembler implements ResourceAssembler<ToolDTO, Resource<ToolDTO>> {
 
     @Override
-    public Resource<Tool> toResource(Tool tool) {
+    public Resource<ToolDTO> toResource(ToolDTO tool) {
 
         return new Resource<>(tool,
                 ControllerLinkBuilder.linkTo(methodOn(ToolController.class).getTool(tool.getId())).withSelfRel(),

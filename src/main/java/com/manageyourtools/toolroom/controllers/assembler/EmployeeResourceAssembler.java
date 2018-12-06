@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers.assembler;
 
+import com.manageyourtools.toolroom.api.model.EmployeeDTO;
 import com.manageyourtools.toolroom.controllers.EmployeeController;
 import com.manageyourtools.toolroom.domains.Employee;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +14,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
-public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Resource<Employee>> {
+public class EmployeeResourceAssembler implements ResourceAssembler<EmployeeDTO, Resource<EmployeeDTO>> {
+
 
     @Override
-    public Resource<Employee> toResource(Employee employee) {
+    public Resource<EmployeeDTO> toResource(EmployeeDTO employee) {
 
         return new Resource<>(employee,
                 ControllerLinkBuilder.linkTo(methodOn(EmployeeController.class).getEmployee(employee.getId())).withSelfRel(),

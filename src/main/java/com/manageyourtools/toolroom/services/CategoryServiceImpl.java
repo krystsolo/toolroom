@@ -1,50 +1,70 @@
 package com.manageyourtools.toolroom.services;
 
+import com.manageyourtools.toolroom.api.mapper.CategoryMapper;
+import com.manageyourtools.toolroom.api.model.CategoryDTO;
 import com.manageyourtools.toolroom.domains.Category;
+import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.CategoryRepository;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_WAREHOUSEMAN;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     @Override
-    public List<Category> findAllCategories(Sort sort) {
+    public List<CategoryDTO> findAllCategories(Sort sort) {
 
-        return categoryRepository.findAll(sort);
+        return categoryRepository.findAll(sort)
+                .stream()
+                .map(categoryMapper::categoryToCategoryDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Category findCategoryById(Long id) {
+    public CategoryDTO findCategoryById(Long id) {
 
-        return categoryRepository.findById(id).orElseThrow(RuntimeException::new);
+        return categoryRepository.findById(id)
+                .map(categoryMapper::categoryToCategoryDTO)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
+    @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
     public void deleteCategory(Long id) {
 
         categoryRepository.deleteById(id);
     }
 
     @Override
-    public Category addCategory(Category category) {
+    @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    public CategoryDTO addCategory(CategoryDTO categoryDTO) {
 
-        return categoryRepository.save(category);
+        Category category = categoryRepository.save(categoryMapper.categoryDTOToCategory(categoryDTO));
+
+        return categoryMapper.categoryToCategoryDTO(category);
     }
 
     @Override
-    public Category updateCategory(Long id, Category category) {
+    @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
 
-        category.setId(id);
+        categoryDTO.setId(id);
+        Category category = categoryRepository.save(categoryMapper.categoryDTOToCategory(categoryDTO));
 
-        return categoryRepository.save(category);
+        return categoryMapper.categoryToCategoryDTO(category);
     }
 }

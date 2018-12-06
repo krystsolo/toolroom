@@ -1,16 +1,16 @@
 package com.manageyourtools.toolroom.services;
 
-import com.manageyourtools.toolroom.domains.BuyOrder;
+import com.manageyourtools.toolroom.api.model.BuyOrderDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
 public interface BuyOrderService {
 
-    Page<BuyOrder> findAllBoughts(Pageable pageable);
-    BuyOrder findBoughtById(Long id);
-    void deleteBought(Long id);
-    BuyOrder addBought(BuyOrder buyOrder);
-    BuyOrder updateBought(Long id, BuyOrder buyOrder);
-    BuyOrder patchBought(Long id, BuyOrder buyOrder);
+    Page<BuyOrderDTO> findAllBuyOrders(Pageable pageable);
+    BuyOrderDTO findBuyOrderById(Long id);
+    void deleteBuyOrder(Long id);
+    BuyOrderDTO addBuyOrder(BuyOrderDTO buyOrderDTO) throws IllegalArgumentException;
+    BuyOrderDTO updateBuyOrder(Long id, BuyOrderDTO buyOrderDTO);
+    BuyOrderDTO patchBuyOrder(Long id, BuyOrderDTO buyOrderDTO);
 }
