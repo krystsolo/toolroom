@@ -90,9 +90,9 @@ public class EmployeeServiceTest {
 
         when(employeeRepository.findAll(Pageable.unpaged())).thenReturn(employees);
 
-        Page<EmployeeDTO> employeePage = employeeService.getEmployees(Pageable.unpaged());
+        List<EmployeeDTO> employeeList = employeeService.getEmployees();
 
-        assertEquals(2, employeePage.getSize());
+        assertEquals(2, employeeList.size());
     }
 
     @Test

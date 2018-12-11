@@ -6,11 +6,13 @@ import com.manageyourtools.toolroom.config.AuthenticationFacade;
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.EmployeeRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_ADMIN;
 
@@ -40,8 +42,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Page<EmployeeDTO> getEmployees(Pageable pageable) {
-        return employeeRepository.findAll(pageable).map(employeeMapper::employeeToEmployeeDTO);
+    public List<EmployeeDTO> getEmployees() {
+        return employeeRepository.findAll().stream().map(employeeMapper::employeeToEmployeeDTO).collect(Collectors.toList());
     }
 
     @Override

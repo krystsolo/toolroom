@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -89,14 +90,14 @@ public class BuyOrderServiceTest {
 
     @Test
     public void findAllBuyOrders() {
-        Page<BuyOrder> buyOrders = new PageImpl<>(Arrays.asList(getBuyOrder1(), getBuyOrder2()),
-                PageRequest.of(0,2),2);
+        List<BuyOrder> buyOrders = Arrays.asList(getBuyOrder1(), getBuyOrder2());
 
-        when(buyOrderRepository.findAll(any(Pageable.class))).thenReturn(buyOrders);
 
-        Page<BuyOrderDTO> orders = buyOrderService.findAllBuyOrders(Pageable.unpaged());
+        when(buyOrderRepository.findAll()).thenReturn(buyOrders);
 
-        assertEquals(2, orders.getSize());
+        List<BuyOrderDTO> orders = buyOrderService.findAllBuyOrders();
+
+        assertEquals(2, orders.size());
     }
 
     @Test

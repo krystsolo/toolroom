@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/buyorders")
 public class BuyOrderController {
@@ -26,9 +28,9 @@ public class BuyOrderController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Page<BuyOrderDTO> getBuyOrders(Pageable pageable){
+    public List<BuyOrderDTO> getBuyOrders(){
 
-        return buyOrderService.findAllBuyOrders(pageable);
+        return buyOrderService.findAllBuyOrders();
     }
 
     @PostMapping("")

@@ -8,7 +8,6 @@ import com.manageyourtools.toolroom.domains.BuyOrderTool;
 import com.manageyourtools.toolroom.domains.Tool;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.*;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -45,9 +44,9 @@ public class BuyOrderServiceImpl implements BuyOrderService {
     }
 
     @Override
-    public Page<BuyOrderDTO> findAllBuyOrders(Pageable pageable) {
+    public List<BuyOrderDTO> findAllBuyOrders() {
 
-        return buyOrderRepository.findAll(pageable).map(buyOrderMapper::buyOrderToBuyOrderDTO);
+        return buyOrderRepository.findAll().stream().map(buyOrderMapper::buyOrderToBuyOrderDTO).collect(Collectors.toList());
     }
 
     @Override

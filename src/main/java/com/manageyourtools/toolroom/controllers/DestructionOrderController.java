@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/destructionorders")
@@ -30,9 +32,9 @@ public class DestructionOrderController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Page<DestructionOrder> getDestructionOrders(Pageable pageable){
+    public List<DestructionOrder> getDestructionOrders(){
 
-        return destructionOrderService.findAllDestructionOrders(pageable);
+        return destructionOrderService.findAllDestructionOrders();
     }
 
     @PostMapping("")

@@ -3,10 +3,11 @@ package com.manageyourtools.toolroom.services;
 import com.manageyourtools.toolroom.domains.DestructionOrder;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.DestructionOrderRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_WAREHOUSEMAN;
 
@@ -20,8 +21,8 @@ public class DestructionOrderServiceImpl implements DestructionOrderService {
     }
 
     @Override
-    public Page<DestructionOrder> findAllDestructionOrders(Pageable pageable) {
-        return destructionOrderRepository.findAll(pageable);
+    public List<DestructionOrder> findAllDestructionOrders() {
+        return destructionOrderRepository.findAll();
     }
 
     @Override

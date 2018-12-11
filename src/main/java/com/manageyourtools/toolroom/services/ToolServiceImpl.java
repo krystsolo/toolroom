@@ -2,16 +2,16 @@ package com.manageyourtools.toolroom.services;
 
 import com.manageyourtools.toolroom.api.mapper.ToolMapper;
 import com.manageyourtools.toolroom.api.model.ToolDTO;
-import com.manageyourtools.toolroom.domains.Category;
 import com.manageyourtools.toolroom.domains.Tool;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.ToolRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_WAREHOUSEMAN;
 
@@ -27,8 +27,8 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public Page<ToolDTO> findAllTools(Pageable pageable) {
-        return toolRepository.findAll(pageable).map(toolMapper::toolToToolDTO);
+    public List<ToolDTO> findAllTools() {
+        return toolRepository.findAll().stream().map(toolMapper::toolToToolDTO).collect(Collectors.toList());
     }
 
     @Override

@@ -10,6 +10,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping(EmployeeController.BASE_URL)
@@ -32,9 +34,9 @@ public class EmployeeController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Page<EmployeeDTO> getEmployees(@PageableDefault Pageable pageable){
+    public List<EmployeeDTO> getEmployees(){
 
-        return employeeService.getEmployees(pageable);
+        return employeeService.getEmployees();
     }
 
     @PostMapping("")
