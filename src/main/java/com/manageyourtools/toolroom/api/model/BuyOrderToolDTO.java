@@ -13,7 +13,7 @@ public class BuyOrderToolDTO {
 
     private Long id;
 
-    private Long toolId;
+    private ToolDTO tool;
 
     @Min(1)
     private Long count;

@@ -34,6 +34,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Employee getEmployeeByUsername(String username) {
+
+        return employeeRepository.findByUserName(username).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
     public Page<EmployeeDTO> getEmployees(Pageable pageable) {
         return employeeRepository.findAll(pageable).map(employeeMapper::employeeToEmployeeDTO);
     }

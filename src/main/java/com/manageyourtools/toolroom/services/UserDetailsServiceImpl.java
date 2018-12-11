@@ -2,6 +2,7 @@ package com.manageyourtools.toolroom.services;
 
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.domains.Role;
+import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.EmployeeRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public static final String HAS_ROLE_WAREHOUSEMAN = "hasRole('WAREHOUSEMAN')";
     public static final String HAS_ROLE_ADMIN = "hasRole('ADMIN')";
-    private static final String ROLE_PREFIX = "ROLE_";
 
     private final EmployeeRepository employeeRepository;
 
@@ -31,25 +32,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Employee employee = employeeRepository.findByUserName(username);
+        Employee employee = employeeRepository.findByUserName(username).orElseThrow(ResourceNotFoundException::new);
 
-        if(employee == null || !employee.getIsActive()) {
-            //todo implement better exception handling
-           throw new RuntimeException("employee with username: " + username + " not found");
+
+        if(!employee.getIsActive()) {
+
+           throw new IllegalArgumentException("employee with username: " + username + "is inactive");
         }
 
-        System.out.println(getAuthorities(employee.getRoles()));
         return new User(
                 employee.getUserName(),
                 employee.getPassword(),
-                getAuthorities(employee.getRoles()));
+                employee.getAuthoritiesFromRoles());
 
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(Set<Role> roles){
-        return roles
-                .stream()
-                .map(role -> new SimpleGrantedAuthority(ROLE_PREFIX + role.getRoleType().name()))
-                .collect(Collectors.toList());
-    }
+
 }

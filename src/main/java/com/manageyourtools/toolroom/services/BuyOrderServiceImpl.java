@@ -100,7 +100,7 @@ public class BuyOrderServiceImpl implements BuyOrderService {
         });
         buyOrder.setWarehouseman(
                 employeeRepository.findByUserName(
-                        authenticationFacade.getUsernameOfCurrentLoggedUser()));
+                        authenticationFacade.getUsernameOfCurrentLoggedUser()).orElseThrow(ResourceNotFoundException::new));
 
         return buyOrderMapper.buyOrderToBuyOrderDTO(buyOrderRepository.save(buyOrder));
     }

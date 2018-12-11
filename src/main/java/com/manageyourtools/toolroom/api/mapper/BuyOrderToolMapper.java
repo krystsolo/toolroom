@@ -11,11 +11,9 @@ import org.mapstruct.factory.Mappers;
 @Mapper(uses = {ToolMapper.class}, componentModel = "spring", typeConversionPolicy = ReportingPolicy.IGNORE)
 public interface BuyOrderToolMapper {
 
-    BuyOrderMapper INSTANCE = Mappers.getMapper(BuyOrderMapper.class);
+    BuyOrderToolMapper INSTANCE = Mappers.getMapper(BuyOrderToolMapper.class);
 
-    @Mapping(target = "toolId", source = "buyOrderTool.tool.id")
     BuyOrderToolDTO buyOrderToolToBuyOrderToolDTO(BuyOrderTool buyOrderTool);
 
-    //@Mapping(source = "buyOrderToolDTO.toolId", target = "tool.id")
-   // BuyOrderTool buyOrderToolDTOToBuyOrderTool(BuyOrderToolDTO buyOrderToolDTO);
+    BuyOrderTool buyOrderToolDTOToBuyOrderTool(BuyOrderToolDTO buyOrderToolDTO);
 }

@@ -26,4 +26,5 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
     private Set<Employee> employees;
+
 }
