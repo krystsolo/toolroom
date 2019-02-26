@@ -2,11 +2,6 @@ package com.manageyourtools.toolroom.controllers;
 
 import com.manageyourtools.toolroom.api.model.EmployeeDTO;
 import com.manageyourtools.toolroom.services.EmployeeService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +22,9 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EmployeeDTO getEmployee(@PathVariable Long id){
+    public EmployeeDTO getEmployee(@PathVariable String id){
 
-        return employeeService.getEmployeeById(id);
+        return employeeService.getEmployeeById(Long.valueOf(id));
     }
 
     @GetMapping("")
@@ -50,9 +45,9 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeDTO updateEmployee(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long id){
+    public EmployeeDTO updateEmployee(@RequestBody EmployeeDTO employeeDTO, @PathVariable String id){
 
-        return employeeService.updateEmployee(id, employeeDTO);
+        return employeeService.updateEmployee(Long.valueOf(id), employeeDTO);
 
     }
 

@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.api.mapper.EmployeeMapper;
 import com.manageyourtools.toolroom.config.JwtTokenUtil;
 import com.manageyourtools.toolroom.domains.AuthToken;
 import com.manageyourtools.toolroom.domains.Employee;
@@ -7,7 +8,6 @@ import com.manageyourtools.toolroom.domains.LoginUser;
 import com.manageyourtools.toolroom.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,12 +23,14 @@ public class AuthenticationController {
     private final JwtTokenUtil jwtTokenUtil;
 
     private final EmployeeService employeeService;
+    private final EmployeeMapper employeeMapper;
 
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, EmployeeService employeeService) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, EmployeeService employeeService, EmployeeMapper employeeMapper) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeeService = employeeService;
+        this.employeeMapper = employeeMapper;
     }
 
     @PostMapping(value = "/generate-token")
@@ -36,7 +38,7 @@ public class AuthenticationController {
     public AuthToken login(@RequestBody LoginUser loginUser) throws AuthenticationException {
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword()));
-        final Employee employee = employeeService.getEmployeeByUsername(loginUser.getUsername());
+        final Employee employee = employeeMapper.employeeDtoToEmployee(employeeService.getEmployeeByUsername(loginUser.getUsername()));
         final String token = jwtTokenUtil.generateToken(employee);
         return new AuthToken(token, employee.getUserName());
     }

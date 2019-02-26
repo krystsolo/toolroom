@@ -9,7 +9,7 @@ import java.util.List;
 public interface EmployeeService {
 
     EmployeeDTO getEmployeeById(Long id);
-    Employee getEmployeeByUsername(String username);
+    EmployeeDTO getEmployeeByUsername(String username);
     List<EmployeeDTO> getEmployees();
     EmployeeDTO deleteEmployee(Long id);
     EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);

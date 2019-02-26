@@ -1,18 +1,20 @@
 package com.manageyourtools.toolroom.config;
 
 import com.manageyourtools.toolroom.domains.Employee;
+import com.manageyourtools.toolroom.domains.RoleEnum;
 import com.manageyourtools.toolroom.services.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtTokenUtil implements Serializable {
 
@@ -47,7 +49,10 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(Employee employee) {
         Claims claims = Jwts.claims().setSubject(employee.getUserName());
 
-        claims.put("scopes", employee.getAuthoritiesFromRoles());
+        ArrayList<RoleEnum> roles = new ArrayList<>();
+        employee.getRoles().forEach(role ->  roles.add(role.getRoleType()));
+
+        claims.put("scopes", roles);
 
         return Jwts.builder()
                 .setClaims(claims)

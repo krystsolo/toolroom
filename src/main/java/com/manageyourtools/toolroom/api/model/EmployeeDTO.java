@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,12 +21,12 @@ public class EmployeeDTO {
     private Long id;
     @NotNull
     private String firstName;
+
     @NotNull
+    @Min(2)
     private String userName;
     @NotNull
     private String surName;
-    @Lob
-    private String image;
 
     private Set<RoleDTO> roles = new HashSet<>();
 
@@ -34,7 +36,7 @@ public class EmployeeDTO {
     private String workingGroup;
 
     private Long phoneNumber;
-
+    @Min(2)
     private String password;
 
     @Email

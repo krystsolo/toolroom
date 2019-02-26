@@ -139,7 +139,7 @@ public class ToolRoomBootstrap implements CommandLineRunner {
 
         buyOrder.setOrderCode("orderCode");
 
-        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko").orElseThrow(ResourceNotFoundException::new));
+        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko"));
         buyOrder.setId(1L);
         buyOrder.addBuyOrderTool(getBuyOrderTools().get(0));
         buyOrder.addBuyOrderTool(getBuyOrderTools().get(1));
@@ -149,7 +149,7 @@ public class ToolRoomBootstrap implements CommandLineRunner {
     private BuyOrder getBuyOrder2(){
         BuyOrder buyOrder = new BuyOrder();
         buyOrder.setAddTimestamp(Timestamp.valueOf("2018-10-10 12:22:23"));
-        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko").orElseThrow(ResourceNotFoundException::new));
+        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko"));
         buyOrder.setOrderCode("123");
         buyOrder.setId(2L);
 
