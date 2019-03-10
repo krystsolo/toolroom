@@ -1,6 +1,7 @@
 package com.manageyourtools.toolroom.controllers;
 
 import com.manageyourtools.toolroom.api.model.EmployeeDTO;
+import com.manageyourtools.toolroom.api.model.EmployeeShortDTO;
 import com.manageyourtools.toolroom.services.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +28,16 @@ public class EmployeeController {
         return employeeService.getEmployeeById(Long.valueOf(id));
     }
 
+    @GetMapping("/{id}/info")
+    @ResponseStatus(HttpStatus.OK)
+    public EmployeeShortDTO getShortInfoAboutEmployee(@PathVariable String id){
+
+        return employeeService.getShortInfoAboutEmployeeById(Long.valueOf(id));
+    }
+
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<EmployeeDTO> getEmployees(){
+    public List<EmployeeShortDTO> getEmployees(){
 
         return employeeService.getEmployees();
     }

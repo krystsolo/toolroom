@@ -5,6 +5,7 @@ import com.manageyourtools.toolroom.api.model.CategoryDTO;
 import com.manageyourtools.toolroom.domains.Category;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.CategoryRepository;
+import com.manageyourtools.toolroom.repositories.ToolRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -19,16 +20,18 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ToolRepository toolRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper, ToolRepository toolRepository) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
+        this.toolRepository = toolRepository;
     }
 
     @Override
     public List<CategoryDTO> findAllCategories(Sort sort) {
 
-        return categoryRepository.findAll(sort)
+        return categoryRepository.findAll()
                 .stream()
                 .map(categoryMapper::categoryToCategoryDTO)
                 .collect(Collectors.toList());
@@ -46,7 +49,16 @@ public class CategoryServiceImpl implements CategoryService {
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
     public void deleteCategory(Long id) {
 
-        categoryRepository.deleteById(id);
+        categoryRepository
+                .findById(id)
+                .ifPresent(category -> {
+                            toolRepository.findAllByCategory(category)
+                                    .forEach(
+                                            tool -> tool.setCategory(null)
+                                    );
+                            categoryRepository.deleteById(id);
+                        }
+                );
     }
 
     @Override

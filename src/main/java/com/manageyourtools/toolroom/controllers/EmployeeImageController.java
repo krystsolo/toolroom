@@ -21,7 +21,7 @@ public class EmployeeImageController {
 
     private final EmployeeImageService imageService;
 
-    public EmployeeImageController(EmployeeImageService imageService, EmployeeService employeeService) {
+    public EmployeeImageController(EmployeeImageService imageService) {
         this.imageService = imageService;
     }
 
@@ -39,5 +39,4 @@ public class EmployeeImageController {
         InputStream in = new ByteArrayInputStream(this.imageService.getImage(Long.valueOf(employeeId)));
         IOUtils.copy(in, response.getOutputStream());
     }
-
 }

@@ -39,6 +39,9 @@ public class EmployeeImageServiceImpl implements EmployeeImageService {
     @Override
     public byte[] getImage(Long id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        if(employee.getImage() == null){
+            throw new ResourceNotFoundException("There is no image in DB for this employee");
+        }
         return employee.getImage();
     }
 }

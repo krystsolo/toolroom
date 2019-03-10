@@ -2,6 +2,7 @@ package com.manageyourtools.toolroom.services;
 
 import com.manageyourtools.toolroom.api.mapper.EmployeeMapper;
 import com.manageyourtools.toolroom.api.model.EmployeeDTO;
+import com.manageyourtools.toolroom.api.model.EmployeeShortDTO;
 import com.manageyourtools.toolroom.config.AuthenticationFacade;
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
@@ -32,8 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public EmployeeDTO getEmployeeById(Long id) {
-
         return employeeRepository.findById(id).map(employeeMapper::employeeToEmployeeDTO).orElseThrow(ResourceNotFoundException::new);
     }
 
@@ -49,8 +50,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeDTO> getEmployees() {
-        return employeeRepository.findAll().stream().map(employeeMapper::employeeToEmployeeDTO).collect(Collectors.toList());
+    public EmployeeShortDTO getShortInfoAboutEmployeeById(Long id) {
+        return employeeRepository.findById(id).map(employeeMapper::employeeToEmployeeShortDTO).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public List<EmployeeShortDTO> getEmployees() {
+        return employeeRepository.findAll().stream().map(employeeMapper::employeeToEmployeeShortDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -60,6 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findById(id).map(employee -> {
                     if (authenticationFacade.getUsernameOfCurrentLoggedUser().equals(employee.getUserName())) {
                         throw new IllegalArgumentException("Cannot deactivate current logged user");
+                        //todo add some fancy exception
                     }
                     employee.setIsActive(false);
                     Employee savedEmployee = employeeRepository.save(employee);
@@ -78,7 +85,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(!employeeToUpdate.isPresent()){
             return saveEmployee(employeeDTO);
         }
+        if(employeeDTO.getPassword() == null || employeeDTO.getPassword().equals("")) {
+            employeeDTO.setPassword(employeeToUpdate.get().getPassword());
+        }
         Employee employee = employeeMapper.employeeDtoToEmployee(employeeDTO);
+
         employee.setId(employeeToUpdate.get().getId());
 
         return employeeMapper.employeeToEmployeeDTO(employeeRepository.save(employee));

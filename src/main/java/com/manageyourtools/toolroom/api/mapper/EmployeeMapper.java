@@ -2,6 +2,7 @@ package com.manageyourtools.toolroom.api.mapper;
 
 import com.manageyourtools.toolroom.api.model.EmployeeDTO;
 
+import com.manageyourtools.toolroom.api.model.EmployeeShortDTO;
 import com.manageyourtools.toolroom.domains.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,4 +17,6 @@ public interface EmployeeMapper {
     Employee employeeDtoToEmployee(EmployeeDTO employeeDTO);
 
     EmployeeDTO employeeToEmployeeDTO(Employee employee);
+
+    EmployeeShortDTO employeeToEmployeeShortDTO(Employee employee);
 }

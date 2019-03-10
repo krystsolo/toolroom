@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -37,6 +38,7 @@ public class Employee {
     private String firstName;
 
     @NotNull
+    @Size(min = 3, max = 30)
     @Column(unique = true)
     private String userName;
 
@@ -44,7 +46,7 @@ public class Employee {
     private String surName;
 
     @Lob
-    private String image;
+    private byte[] image;
 
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -61,12 +63,14 @@ public class Employee {
     private Long phoneNumber;
 
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Email
     private String email;
 
-    @OneToMany(mappedBy = "warehouseman")
+    @OneToMany(mappedBy = "warehouseman", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JsonIgnore
     private List<BuyOrder> buyOrders;
 
