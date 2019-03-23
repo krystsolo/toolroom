@@ -63,36 +63,10 @@ public class Employee {
     private Long phoneNumber;
 
     @NotNull
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Email
     private String email;
-
-    @OneToMany(mappedBy = "warehouseman", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonIgnore
-    private List<BuyOrder> buyOrders;
-
-    @OneToMany(mappedBy = "warehouseman")
-    @JsonIgnore
-    private List<DestructionOrder> destructionOrders;
-
-    @OneToMany(mappedBy = "pickWarehouseman")
-    @JsonIgnore
-    private List<LendingOrder> lendingOrdersRentals;
-
-    @OneToMany(mappedBy = "worker")
-    @JsonIgnore
-    private List<LendingOrder> lendingOrdersDownloads;
-
-    @OneToMany(mappedBy = "returnWarehouseman")
-    @JsonIgnore
-    private List<LendingOrder> lendingOrdersReturns;
-
-    @OneToMany(mappedBy = "returnWarehouseman")
-    @JsonIgnore
-    private List<LendingOrder> lendingOrderToolReturns;
 
     public Collection<? extends GrantedAuthority> getAuthoritiesFromRoles(){
         return this.roles
