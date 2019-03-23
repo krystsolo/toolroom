@@ -54,12 +54,4 @@ public class BuyOrderController {
 
         buyOrderService.deleteBuyOrder(id);
     }
-
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public BuyOrderDTO patchBuyOrder(@PathVariable Long id, @RequestBody BuyOrderDTO buyOrderDTO) {
-
-        return buyOrderService.patchBuyOrder(id, buyOrderDTO);
-    }
-
 }

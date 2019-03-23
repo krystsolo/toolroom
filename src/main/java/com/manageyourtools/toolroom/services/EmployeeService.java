@@ -9,13 +9,12 @@ import java.util.List;
 
 public interface EmployeeService {
 
-    EmployeeDTO getEmployeeById(Long id);
-    EmployeeDTO getEmployeeByUsername(String username);
+    EmployeeDTO getEmployeeDtoById(Long id);
+    Employee getEmployeeById(Long id);
+    Employee getEmployeeByUsername(String username);
     List<EmployeeShortDTO> getEmployees();
     EmployeeDTO deleteEmployee(Long id);
     EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
     EmployeeDTO saveEmployee(EmployeeDTO employeeDTO);
-    EmployeeDTO patchEmployee(Long id, EmployeeDTO employeeDTO);
-
     EmployeeShortDTO getShortInfoAboutEmployeeById(Long id);
 }

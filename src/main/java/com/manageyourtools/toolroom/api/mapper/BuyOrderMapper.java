@@ -16,7 +16,7 @@ public interface BuyOrderMapper {
     @InheritInverseConfiguration
     BuyOrder buyOrderDtoToBuyOrder(BuyOrderDTO buyOrderDTO);
 
-    @Mapping(target = "warehousemanUsername", source = "buyOrder.warehouseman.userName")
+    @Mapping(target = "warehousemanId", source = "buyOrder.warehouseman.id")
     BuyOrderDTO buyOrderToBuyOrderDTO(BuyOrder buyOrder);
 
 }

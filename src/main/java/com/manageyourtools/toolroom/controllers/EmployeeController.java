@@ -25,7 +25,7 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     public EmployeeDTO getEmployee(@PathVariable String id){
 
-        return employeeService.getEmployeeById(Long.valueOf(id));
+        return employeeService.getEmployeeDtoById(Long.valueOf(id));
     }
 
     @GetMapping("/{id}/info")

@@ -1,9 +1,7 @@
 package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -13,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
 @Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Tool {
 
     @Id
@@ -32,8 +32,7 @@ public class Tool {
     private UnitOfMeasure unitOfMeasure;
     private Long allCount;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                    CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
@@ -51,17 +50,17 @@ public class Tool {
     private Boolean isEnable = true;
 
     @Lob
-    private String image;
+    private byte[] image;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
     @JsonIgnore
     private List<BuyOrderTool> buyOrderTools = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
     @JsonIgnore
     private List<DestructionOrderTool> destructionOrderTools = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
     @JsonIgnore
     private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
 
@@ -83,11 +82,4 @@ public class Tool {
         return this;
     }
 
-    public Tool addCategory(Category category){
-        this.category = category;
-        List<Tool> tools = category.getTools();
-        tools.add(this);
-        category.setTools(tools);
-        return this;
-    }
 }

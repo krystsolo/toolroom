@@ -1,6 +1,7 @@
 package com.manageyourtools.toolroom.services;
 
 import com.manageyourtools.toolroom.api.model.ToolDTO;
+import com.manageyourtools.toolroom.domains.Tool;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -9,9 +10,9 @@ import java.util.List;
 public interface ToolService {
 
     List<ToolDTO> findAllTools();
-    ToolDTO findTool(Long id);
+    ToolDTO getToolDto(Long id);
+    Tool findToolById(Long id);
     ToolDTO saveTool(ToolDTO toolDTO);
     ToolDTO updateTool(Long id, ToolDTO toolDTO);
     void deleteTool(Long id);
-    ToolDTO patchTool(Long id, ToolDTO toolDTO);
 }

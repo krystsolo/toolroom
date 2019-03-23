@@ -38,7 +38,7 @@ public class AuthenticationController {
     public AuthToken login(@RequestBody LoginUser loginUser) throws AuthenticationException {
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword()));
-        final Employee employee = employeeMapper.employeeDtoToEmployee(employeeService.getEmployeeByUsername(loginUser.getUsername()));
+        final Employee employee = employeeService.getEmployeeByUsername(loginUser.getUsername());
         final String token = jwtTokenUtil.generateToken(employee);
         return new AuthToken(token, employee.getUserName());
     }

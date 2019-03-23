@@ -40,5 +40,4 @@ public class ToolDTO {
     @NotNull
     private Boolean isEnable;
 
-    private String image;
 }

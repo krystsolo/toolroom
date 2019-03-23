@@ -34,19 +34,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @PreAuthorize(HAS_ROLE_ADMIN)
-    public EmployeeDTO getEmployeeById(Long id) {
-        return employeeRepository.findById(id).map(employeeMapper::employeeToEmployeeDTO).orElseThrow(ResourceNotFoundException::new);
+    public EmployeeDTO getEmployeeDtoById(Long id) {
+        return employeeMapper.employeeToEmployeeDTO(getEmployeeById(id));
     }
 
     @Override
-    public EmployeeDTO getEmployeeByUsername(String username) {
+    public Employee getEmployeeByUsername(String username) {
 
-        Employee employee = employeeRepository.findByUserName(username);
-
-        if(employee == null) {
-            throw new ResourceNotFoundException("Employee not found");
-        }
-        return employeeMapper.employeeToEmployeeDTO(employee);
+        return employeeRepository.findByUserName(username).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -105,55 +100,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.employeeToEmployeeDTO(employeeRepository.save(employee));
     }
 
-    @Override
-    @PreAuthorize(HAS_ROLE_ADMIN)
-    public EmployeeDTO patchEmployee(Long id, EmployeeDTO employeeDTO) {
-
-        return employeeRepository.findById(id).map(updatedEmployee -> {
-            Employee employee = employeeMapper.employeeDtoToEmployee(employeeDTO);
-
-            if (employee.getFirstName() != null) {
-                updatedEmployee.setFirstName(employee.getFirstName());
-            }
-
-            if (employee.getSurName() != null) {
-                updatedEmployee.setSurName(employee.getSurName());
-            }
-
-            if (employee.getUserName() != null) {
-                updatedEmployee.setUserName(employee.getUserName());
-            }
-
-            if (employee.getIsActive() != null) {
-                updatedEmployee.setIsActive(employee.getIsActive());
-            }
-
-            if (employee.getPassword() != null) {
-                updatedEmployee.setPassword(bCryptPasswordEncoder.encode(employee.getPassword()));
-            }
-
-            if (employee.getImage() != null) {
-                updatedEmployee.setImage(employee.getImage());
-            }
-
-            if (employee.getPhoneNumber() != null) {
-                updatedEmployee.setPhoneNumber(employee.getPhoneNumber());
-            }
-
-            if (employee.getWorkingGroup() != null) {
-                updatedEmployee.setWorkingGroup(employee.getWorkingGroup());
-            }
-
-            if (employee.getEmail() != null) {
-                updatedEmployee.setEmail(employee.getEmail());
-            }
-
-            if (employee.getRoles() != null) {
-                updatedEmployee.setRoles(employee.getRoles());
-            }
-
-            return employeeMapper.employeeToEmployeeDTO(employeeRepository.save(updatedEmployee));
-
-        }).orElseThrow(ResourceNotFoundException::new);
+    public Employee getEmployeeById(Long id) {
+        return employeeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 }

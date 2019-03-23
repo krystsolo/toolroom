@@ -3,8 +3,6 @@ package com.manageyourtools.toolroom.controllers;
 import com.manageyourtools.toolroom.api.model.ToolDTO;
 
 import com.manageyourtools.toolroom.services.ToolService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tools")
+@RequestMapping(ToolController.BASE_URL)
 public class ToolController {
 
+    protected static final String BASE_URL = "/tools";
     private ToolService toolService;
 
     public ToolController(ToolService toolService) {
@@ -25,7 +24,7 @@ public class ToolController {
     @ResponseStatus(HttpStatus.OK)
     public ToolDTO getTool(@PathVariable Long id){
 
-        return toolService.findTool(id);
+        return toolService.getToolDto(id);
     }
 
     @GetMapping("")
