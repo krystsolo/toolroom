@@ -24,7 +24,7 @@ public class BuyOrderDTO {
 
     private List<BuyOrderToolDTO> buyOrderTools = new ArrayList<>();
 
-    private String warehousemanUsername;
+    private Long warehousemanId;
 
     private String description;
 }

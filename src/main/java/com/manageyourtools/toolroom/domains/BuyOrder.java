@@ -2,10 +2,7 @@ package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,6 +15,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "orderCode")
 public class BuyOrder {
 
     @Id
@@ -34,7 +33,7 @@ public class BuyOrder {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "buyOrder")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "buyOrder")
     @JsonIgnore
     private List<BuyOrderTool> buyOrderTools = new ArrayList<>();
 
@@ -45,9 +44,9 @@ public class BuyOrder {
 
     private String description;
 
-    public BuyOrder addBuyOrderTool(BuyOrderTool buyOrderTool){
-        buyOrderTool.setBuyOrder(this);
+    public BuyOrder addBuyOrderTool(BuyOrderTool buyOrderTool) {
         this.buyOrderTools.add(buyOrderTool);
+        buyOrderTool.setBuyOrder(this);
         return this;
     }
 }

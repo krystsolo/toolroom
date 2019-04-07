@@ -13,5 +13,4 @@ public interface BuyOrderService {
     void deleteBuyOrder(Long id);
     BuyOrderDTO addBuyOrder(BuyOrderDTO buyOrderDTO) throws IllegalArgumentException;
     BuyOrderDTO updateBuyOrder(Long id, BuyOrderDTO buyOrderDTO);
-    BuyOrderDTO patchBuyOrder(Long id, BuyOrderDTO buyOrderDTO);
 }

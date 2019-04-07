@@ -8,39 +8,39 @@ import com.manageyourtools.toolroom.domains.BuyOrderTool;
 import com.manageyourtools.toolroom.domains.Tool;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.*;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_WAREHOUSEMAN;
 
 @Service
+@Slf4j
 public class BuyOrderServiceImpl implements BuyOrderService {
 
     private final BuyOrderRepository buyOrderRepository;
     private final AuthenticationFacade authenticationFacade;
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
     private final LendingOrderToolRepository lendingOrderToolRepository;
     private final DestructionOrderToolRepository destructionOrderToolRepository;
     private final BuyOrderMapper buyOrderMapper;
-    private final ToolRepository toolRepository;
+    private final ToolService toolService;
 
     public BuyOrderServiceImpl(BuyOrderRepository buyOrderRepository, AuthenticationFacade authenticationFacade,
-                               EmployeeRepository employeeRepository, LendingOrderToolRepository lendingOrderToolRepository,
-                               DestructionOrderToolRepository destructionOrderToolRepository, BuyOrderMapper buyOrderMapper, ToolRepository toolRepository) {
+                               EmployeeService employeeService, LendingOrderToolRepository lendingOrderToolRepository,
+                               DestructionOrderToolRepository destructionOrderToolRepository, BuyOrderMapper buyOrderMapper, ToolService toolService) {
         this.buyOrderRepository = buyOrderRepository;
         this.authenticationFacade = authenticationFacade;
-        this.employeeRepository = employeeRepository;
+        this.employeeService = employeeService;
         this.lendingOrderToolRepository = lendingOrderToolRepository;
         this.destructionOrderToolRepository = destructionOrderToolRepository;
         this.buyOrderMapper = buyOrderMapper;
-        this.toolRepository = toolRepository;
+        this.toolService = toolService;
     }
 
     @Override
@@ -60,48 +60,16 @@ public class BuyOrderServiceImpl implements BuyOrderService {
     public void deleteBuyOrder(Long id) throws IllegalArgumentException {
 
         buyOrderRepository.findById(id).ifPresent(buyOrder -> {
-
-            List<BuyOrderTool> buyOrderTools = buyOrder.getBuyOrderTools();
-
-            buyOrderTools.forEach(buyOrderTool -> {
-                Tool tool = buyOrderTool.getTool();
-
-                checkIfThereWasAnyDestructionOrLendingOperationAfterBuyOrderOnTool(buyOrder, tool);
-
-                tool = backToToolCountBeforePurchase(buyOrderTool.getCount(), tool);
-                buyOrderTool.setTool(tool);
-            });
-            buyOrder.setBuyOrderTools(buyOrderTools);
-            buyOrderRepository.save(buyOrder);
+            this.restoreToolsToStateBeforePreviousOrder(buyOrder);
             buyOrderRepository.deleteById(id);
         });
     }
 
-
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
     public BuyOrderDTO addBuyOrder(BuyOrderDTO buyOrderDTO) throws IllegalArgumentException {
-
         BuyOrder buyOrder = buyOrderMapper.buyOrderDtoToBuyOrder(buyOrderDTO);
-
-        List<BuyOrderTool> buyOrderTools = buyOrder.getBuyOrderTools();
-
-        buyOrderTools.forEach(buyOrderTool -> {
-
-            Tool tool = toolRepository.findById(buyOrderTool.getTool().getId())
-                    .orElseThrow(ResourceNotFoundException::new);
-
-            checkIfToolIsEnable(tool);
-            checkIfUniqueToolWillNotBeOverloaded(tool, buyOrderTool.getCount());
-
-            tool = additionToolCount(buyOrderTool.getCount(), tool);
-            buyOrderTool.setTool(tool);
-        });
-        buyOrder.setWarehouseman(
-                employeeRepository.findByUserName(
-                        authenticationFacade.getUsernameOfCurrentLoggedUser()));
-
-        return buyOrderMapper.buyOrderToBuyOrderDTO(buyOrderRepository.save(buyOrder));
+        return buyOrderMapper.buyOrderToBuyOrderDTO(saveBuyOrder(buyOrder));
     }
 
     @Override
@@ -110,85 +78,85 @@ public class BuyOrderServiceImpl implements BuyOrderService {
 
         Optional<BuyOrder> savedBuyOrderOptional = buyOrderRepository.findById(id);
         if (!savedBuyOrderOptional.isPresent()) {
-
             return addBuyOrder(buyOrderDTO);
         }
 
         BuyOrder buyOrder = buyOrderMapper.buyOrderDtoToBuyOrder(buyOrderDTO);
 
-        List<BuyOrderTool> buyOrderTools = buyOrder.getBuyOrderTools();
+        return buyOrderMapper.buyOrderToBuyOrderDTO(changeBuyOrder(savedBuyOrderOptional.get(), buyOrder));
+    }
+
+    protected BuyOrder changeBuyOrder(BuyOrder savedBuyOrder, BuyOrder buyOrder) {
+
+        this.restoreToolsToStateBeforePreviousOrder(savedBuyOrder);
+        this.checkAndCountToolsFromOrder(buyOrder);
+
+        buyOrder.setWarehouseman(this.employeeService.getLoggedEmployee());
+        buyOrder.setId(savedBuyOrder.getId());
+        return buyOrderRepository.save(buyOrder);
+    }
+
+    protected void restoreToolsToStateBeforePreviousOrder(BuyOrder buyOrder) {
+        buyOrder.getBuyOrderTools()
+                .forEach(buyOrderTool -> {
+                    Tool tool = buyOrderTool.getTool();
+                    this.checkIfToolIsEnable(tool);
+                    this.checkIfThereWasNoDestructionOrLendingOperationAfterBuyOrderOnTool(buyOrder.getAddTimestamp(), tool);
+                    this.backToToolCountBeforePurchase(buyOrderTool.getCount(), tool);
+                });
+    }
+
+    protected void checkAndCountToolsFromOrder(BuyOrder buyOrder) {
+
+        List<BuyOrderTool> buyOrderTools = new ArrayList<>(buyOrder.getBuyOrderTools());
+
+        checkIfThereIsNoToolRepeat(buyOrderTools);
 
         buyOrderTools.forEach(buyOrderTool -> {
             long toolId = buyOrderTool.getTool().getId();
-            Tool tool = toolRepository.findById(toolId).orElseThrow(ResourceNotFoundException::new);
+            Tool tool = toolService.findToolById(toolId);
 
-            checkIfToolIsEnable(tool);
-            checkIfUniqueToolWillNotBeOverloaded(tool, buyOrderTool.getCount());
-            buyOrderTool.setTool(tool);
+            this.checkIfToolIsEnable(tool);
+            this.checkIfUniqueToolWillNotBeOverloaded(tool, buyOrderTool.getCount());
+            this.calculateToolCount(buyOrderTool.getCount(), tool);
+
+            tool.addBuyOrderTool(buyOrderTool);
+            buyOrder.addBuyOrderTool(buyOrderTool);
         });
-
-        BuyOrder savedBuyOrder = savedBuyOrderOptional.get();
-        List<BuyOrderTool> savedBuyOrderTools = savedBuyOrder.getBuyOrderTools();
-
-        List<BuyOrderTool> buyOrderToolFiltered = savedBuyOrderTools
-                .stream()
-                .filter(savedBuyOrderTool -> {
-                    boolean isToolNewInOrderOrCountIsNotLowerFromPreviousSaved = true;
-                    for (BuyOrderTool buyOrderTool : buyOrderTools) {
-                        if ((buyOrderTool.getId().equals(savedBuyOrderTool.getId()) &&
-                                buyOrderTool.getCount() >= savedBuyOrderTool.getCount())) {
-                            isToolNewInOrderOrCountIsNotLowerFromPreviousSaved = false;
-                        }
-                    }
-                    return isToolNewInOrderOrCountIsNotLowerFromPreviousSaved;
-                }).collect(Collectors.toList());
-
-        buyOrderToolFiltered.forEach(buyOrderTool ->
-                checkIfThereWasAnyDestructionOrLendingOperationAfterBuyOrderOnTool(buyOrder, buyOrderTool.getTool()));
-
-        savedBuyOrderTools.forEach(savedBuyOrderTool -> {
-                    Tool tool = backToToolCountBeforePurchase(savedBuyOrderTool.getCount(), savedBuyOrderTool.getTool());
-                    toolRepository.save(tool);
-                }
-        );
-
-
-        buyOrderTools.forEach(buyOrderTool -> {
-                    Tool tool = toolRepository.findById(buyOrderTool.getTool().getId()).orElseThrow(ResourceNotFoundException::new);
-                    tool = additionToolCount(buyOrderTool.getCount(), tool);
-                    buyOrderTool.setTool(tool);
-                }
-        );
-        buyOrder.setBuyOrderTools(buyOrderTools);
-
-        return buyOrderMapper.buyOrderToBuyOrderDTO(buyOrderRepository.save(buyOrder));
     }
 
-    @Override
-    @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
-    public BuyOrderDTO patchBuyOrder(Long id, BuyOrderDTO buyOrderDTO) {
-        //todo I'm not sure if patch method will be necessary here
-        return null;
+    protected BuyOrder saveBuyOrder(BuyOrder buyOrder) {
+        this.checkAndCountToolsFromOrder(buyOrder);
+
+        buyOrder.setWarehouseman(
+                this.employeeService.getLoggedEmployee());
+
+        return buyOrderRepository.save(buyOrder);
+    }
+
+    protected void decreaseToolCountIfWasInPreviousBuyOrder(List<BuyOrderTool> previousBuyOrderTools, Tool tool) {
+        previousBuyOrderTools.stream()
+                .filter(buyOrderTool -> buyOrderTool.getTool().getId().equals(tool.getId()))
+                .findFirst()
+                .ifPresent(buyOrderTool -> backToToolCountBeforePurchase(buyOrderTool.getCount(), tool));
+        log.info("tool all count during=" + tool.getAllCount());
+
     }
 
     protected void checkIfUniqueToolWillNotBeOverloaded(Tool tool, long addCount) throws IllegalArgumentException {
-        if (tool.getIsUnique() && (tool.getAllCount() + addCount > 0)) {
+        if (tool.getIsUnique() && (tool.getAllCount() + addCount > 1)) {
             throw new IllegalArgumentException("Cannot add to " + tool.getName() + " this number of tools, because it has unique flag");
         }
     }
 
-    protected Tool backToToolCountBeforePurchase(Long toolCountFromOrder, Tool tool) {
-
+    protected void backToToolCountBeforePurchase(Long toolCountFromOrder, Tool tool) {
         tool.setCurrentCount(tool.getCurrentCount() - toolCountFromOrder);
         tool.setAllCount(tool.getAllCount() - toolCountFromOrder);
-        return tool;
     }
 
-    protected void checkIfThereWasAnyDestructionOrLendingOperationAfterBuyOrderOnTool(BuyOrder buyOrder, Tool tool) throws IllegalArgumentException {
-        Timestamp additionToBuyOrder = buyOrder.getAddTimestamp();
-
-        if (isWasAnyDestructionOperationAfterBuyOrderOnTool(tool, additionToBuyOrder) || isWasAnyLendingOperationAfterBuyOrderOnTool(tool, additionToBuyOrder)) {
-            throw new IllegalArgumentException("Cannot delete Buy Order " + buyOrder.getId() + " because added tools to warehouse can be in used");
+    protected void checkIfThereWasNoDestructionOrLendingOperationAfterBuyOrderOnTool(Timestamp addTime, Tool tool) throws IllegalArgumentException {
+        if (isWasAnyDestructionOperationAfterBuyOrderOnTool(tool, addTime) || isWasAnyLendingOperationAfterBuyOrderOnTool(tool, addTime)) {
+            throw new IllegalArgumentException("Cannot do operation on Buy Order, because for tool " + tool.getName() + " there are lending or destruction orders after buy order addition");
         }
     }
 
@@ -204,17 +172,26 @@ public class BuyOrderServiceImpl implements BuyOrderService {
                 .anyMatch(destructionOrderTool -> destructionOrderTool.getDestructionOrder().getAddTimestamp().after(additionToBuyOrder));
     }
 
-    protected Tool additionToolCount(Long toolCountFromOrder, Tool tool) {
-
+    protected void calculateToolCount(Long toolCountFromOrder, Tool tool) {
         tool.setCurrentCount(tool.getCurrentCount() + toolCountFromOrder);
         tool.setAllCount(tool.getAllCount() + toolCountFromOrder);
-        return tool;
     }
 
     protected void checkIfToolIsEnable(Tool tool) throws IllegalArgumentException {
         if (!tool.getIsEnable()) {
             throw new IllegalArgumentException("Cannot add " + tool.getName() + " tool, because it was disabled");
         }
+    }
+
+    protected void checkIfThereIsNoToolRepeat(List<BuyOrderTool> buyOrderTools) {
+        List<Long> tools = buyOrderTools.stream().map(buyOrderTool -> buyOrderTool.getTool().getId()).collect(Collectors.toList());
+        if (!containsUnique(tools)) {
+            throw new IllegalArgumentException("There are more than one buyOrderTool for one specific tool");
+        }
+    }
+
+    protected <T> boolean containsUnique(List<T> list) {
+        return list.stream().allMatch(new HashSet<>()::add);
     }
 
 }
