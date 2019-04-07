@@ -65,11 +65,4 @@ public class EmployeeController {
 
         return employeeService.deleteEmployee(id);
     }
-
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public EmployeeDTO patchEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO){
-
-        return employeeService.patchEmployee(id, employeeDTO);
-    }
 }

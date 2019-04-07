@@ -1,13 +1,10 @@
 package com.manageyourtools.toolroom.controllers;
 
-import com.manageyourtools.toolroom.api.model.EmployeeDTO;
 import com.manageyourtools.toolroom.services.EmployeeImageService;
-import com.manageyourtools.toolroom.services.EmployeeService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sun.nio.ch.IOUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;

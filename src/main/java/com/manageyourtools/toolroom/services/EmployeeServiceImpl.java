@@ -61,7 +61,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findById(id).map(employee -> {
                     if (authenticationFacade.getUsernameOfCurrentLoggedUser().equals(employee.getUserName())) {
                         throw new IllegalArgumentException("Cannot deactivate current logged user");
-                        //todo add some fancy exception
                     }
                     employee.setIsActive(false);
                     Employee savedEmployee = employeeRepository.save(employee);
@@ -102,5 +101,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public Employee getLoggedEmployee() {
+        return this.getEmployeeByUsername(
+                authenticationFacade.getUsernameOfCurrentLoggedUser());
     }
 }

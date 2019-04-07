@@ -2,6 +2,9 @@ package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
@@ -10,7 +13,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Category {
 
     @Id
@@ -20,8 +25,4 @@ public class Category {
     @NotNull
     @Column(unique = true)
     private String name;
-
-    /*@OneToMany(mappedBy = "category")
-    private List<Tool> tools;*/
-
 }

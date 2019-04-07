@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manageyourtools.toolroom.domains.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +38,7 @@ public class EmployeeDTO {
 
     private Long phoneNumber;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Email

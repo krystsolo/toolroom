@@ -17,4 +17,5 @@ public interface EmployeeService {
     EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
     EmployeeDTO saveEmployee(EmployeeDTO employeeDTO);
     EmployeeShortDTO getShortInfoAboutEmployeeById(Long id);
+    Employee getLoggedEmployee();
 }

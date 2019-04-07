@@ -54,11 +54,4 @@ public class ToolController {
 
         toolService.deleteTool(id);
     }
-
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ToolDTO patchTool(@PathVariable Long id, @RequestBody ToolDTO toolDTO) {
-
-        return toolService.patchTool(id, toolDTO);
-    }
 }
