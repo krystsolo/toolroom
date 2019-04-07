@@ -1,5 +1,6 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.api.model.DestructionOrderDTO;
 import com.manageyourtools.toolroom.domains.DestructionOrder;
 import com.manageyourtools.toolroom.services.DestructionOrderService;
 import org.springframework.data.domain.Page;
@@ -25,28 +26,28 @@ public class DestructionOrderController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DestructionOrder getDestructionOrder(@PathVariable Long id){
+    public DestructionOrderDTO getDestructionOrder(@PathVariable Long id){
 
         return destructionOrderService.findDestructionOrderById(id);
     }
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<DestructionOrder> getDestructionOrders(){
+    public List<DestructionOrderDTO> getDestructionOrders(){
 
         return destructionOrderService.findAllDestructionOrders();
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public DestructionOrder addDestructionOrder(@RequestBody DestructionOrder destructionOrder){
+    public DestructionOrderDTO addDestructionOrder(@RequestBody DestructionOrderDTO destructionOrder){
 
         return destructionOrderService.addDestructionOrder(destructionOrder);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public DestructionOrder updateDestructionOrder(@RequestBody DestructionOrder destructionOrder, @PathVariable Long id) {
+    public DestructionOrderDTO updateDestructionOrder(@RequestBody DestructionOrderDTO destructionOrder, @PathVariable Long id) {
 
         return destructionOrderService.updateDestructionOrder(id, destructionOrder);
 
@@ -57,12 +58,5 @@ public class DestructionOrderController {
     public void deleteDestructionOrder(@PathVariable Long id){
 
         destructionOrderService.deleteDestructionOrder(id);
-    }
-
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public DestructionOrder patchDestructionOrder(@PathVariable Long id, @RequestBody DestructionOrder destructionOrder) {
-
-        return destructionOrderService.patchDestructionOrder(id, destructionOrder);
     }
 }

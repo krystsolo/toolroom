@@ -1,11 +1,17 @@
 package com.manageyourtools.toolroom.domains;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class DestructionOrderTool {
 
     @Id

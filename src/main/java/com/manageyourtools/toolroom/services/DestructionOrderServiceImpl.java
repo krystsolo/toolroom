@@ -1,13 +1,20 @@
 package com.manageyourtools.toolroom.services;
 
+import com.manageyourtools.toolroom.api.mapper.DestructionOrderMapper;
+import com.manageyourtools.toolroom.api.model.DestructionOrderDTO;
+import com.manageyourtools.toolroom.config.AuthenticationFacade;
 import com.manageyourtools.toolroom.domains.DestructionOrder;
+import com.manageyourtools.toolroom.domains.DestructionOrderTool;
+import com.manageyourtools.toolroom.domains.Employee;
+import com.manageyourtools.toolroom.domains.Tool;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.DestructionOrderRepository;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_WAREHOUSEMAN;
 
@@ -15,50 +22,149 @@ import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_R
 public class DestructionOrderServiceImpl implements DestructionOrderService {
 
     private final DestructionOrderRepository destructionOrderRepository;
+    private final DestructionOrderMapper destructionOrderMapper;
+    private final AuthenticationFacade authenticationFacade;
+    private final EmployeeService employeeService;
+    private final ToolService toolService;
 
-    public DestructionOrderServiceImpl(DestructionOrderRepository destructionOrderRepository) {
+    public DestructionOrderServiceImpl(DestructionOrderRepository destructionOrderRepository, DestructionOrderMapper destructionOrderMapper, AuthenticationFacade authenticationFacade, EmployeeService employeeService, ToolService toolService) {
         this.destructionOrderRepository = destructionOrderRepository;
+        this.destructionOrderMapper = destructionOrderMapper;
+        this.authenticationFacade = authenticationFacade;
+        this.employeeService = employeeService;
+        this.toolService = toolService;
     }
 
     @Override
-    public List<DestructionOrder> findAllDestructionOrders() {
-        return destructionOrderRepository.findAll();
+    public List<DestructionOrderDTO> findAllDestructionOrders() {
+        return destructionOrderRepository.findAll().stream().map(destructionOrderMapper::destructionOrderToDestructionOrderDto).collect(Collectors.toList());
     }
 
     @Override
-    public DestructionOrder findDestructionOrderById(Long id) {
-        return destructionOrderRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    public DestructionOrderDTO findDestructionOrderById(Long id) {
+        return destructionOrderRepository.findById(id).map(destructionOrderMapper::destructionOrderToDestructionOrderDto).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    @Transactional
     public void deleteDestructionOrder(Long id) {
-        //todo retrieve tools which status were changed to destroyed - tools and their counts, change tool status 'isEnable' to true
+        this.destructionOrderRepository.findById(id)
+                .ifPresent(destructionOrder -> destructionOrder.getDestructionOrderTools()
+                        .forEach(destructionOrderTool ->
+                                undoDestructionChangesOnTool(destructionOrderTool.getTool(), destructionOrderTool.getCount()))
+                );
         destructionOrderRepository.deleteById(id);
     }
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
-    public DestructionOrder addDestructionOrder(DestructionOrder destructionOrder) {
-        //todo if tool has unique flag and count on magazine is equal 1 then change currentCount and maxCOunt to 0 and set isEnable to false
-        //if tool count to destroy is bigger then current count then throw not enough tools count to order them as destroyed exception
-        //if tool is not unique then decrease count of tool - if allCount equal 0 then set isEnable to false
-        return destructionOrderRepository.save(destructionOrder);
+    public DestructionOrderDTO addDestructionOrder(DestructionOrderDTO destructionOrderDTO) {
+
+        DestructionOrder destructionOrder = destructionOrderMapper.destructionOrderDtoToDestructionOrder(destructionOrderDTO);
+
+        List<DestructionOrderTool> destructionOrderTools = new ArrayList<>(destructionOrder.getDestructionOrderTools());
+        destructionOrderTools.forEach(destructionOrderTool -> {
+            long toolId = destructionOrderTool.getTool().getId();
+            Tool tool = toolService.findToolById(toolId);
+            if (!tool.getIsEnable()) {
+                throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because it was disabled");
+            }
+            long count = destructionOrderTool.getCount();
+            if (tool.getAllCount() < count || tool.getCurrentCount() < count) {
+                throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because destroy count was bigger then number of tool");
+            }
+            tool.setCurrentCount(tool.getCurrentCount() - count);
+            tool.setAllCount(tool.getAllCount() - count);
+            if (tool.getIsUnique()) {
+                tool.setIsEnable(false);
+            }
+
+            tool.addDestructionOrderTool(destructionOrderTool);
+            destructionOrder.addDestroyedTool(destructionOrderTool);
+        });
+
+        Employee warehouseman = employeeService.getEmployeeByUsername(
+                authenticationFacade.getUsernameOfCurrentLoggedUser());
+        destructionOrder.setWarehouseman(warehouseman);
+
+        DestructionOrder savedDestructionOrder = destructionOrderRepository.save(destructionOrder);
+        return destructionOrderMapper.destructionOrderToDestructionOrderDto(savedDestructionOrder);
     }
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
-    public DestructionOrder updateDestructionOrder(Long id, DestructionOrder destructionOrder) {
-        //todo check if changed number of tools is bigger from this before or smaller
-        //-> if smaller than retrieve specified number of tool and check if there is need to change isEnable status
-        //-> if bigger than change number of specified tool is not bigger than current value of Tool on magazine -> throw exception or change number of max and current count and isEnable if needed
+    public DestructionOrderDTO updateDestructionOrder(Long id, DestructionOrderDTO destructionOrderDTO) {
+
+        Optional<DestructionOrder> destructionOrderOptional = destructionOrderRepository.findById(id);
+        if (!destructionOrderOptional.isPresent()) {
+            return addDestructionOrder(destructionOrderDTO);
+        }
+
+        DestructionOrder destructionOrder = destructionOrderMapper.destructionOrderDtoToDestructionOrder(destructionOrderDTO);
+
+        List<DestructionOrderTool> destructionOrderTools = new ArrayList<>(destructionOrder.getDestructionOrderTools());
+
+        List<DestructionOrderTool> previousDestructionOrderTools = destructionOrderOptional.get().getDestructionOrderTools();
+
+        previousDestructionOrderTools.stream()
+                .filter(destructionOrderTool -> !isAnyDestructionOrderToolForTool(destructionOrderTools, destructionOrderTool.getTool()))
+                .forEach(destructionOrderTool -> {
+                    Tool tool = destructionOrderTool.getTool();
+                    undoDestructionChangesOnTool(tool, destructionOrderTool.getCount());
+                });
+
+        destructionOrderTools.forEach(destructionOrderTool -> {
+            long toolId = destructionOrderTool.getTool().getId();
+            Tool tool = toolService.findToolById(toolId);
+
+            this.discardPreviousDestructionChangesOnToolIfPresent(previousDestructionOrderTools, tool);
+            long count = destructionOrderTool.getCount();
+            if (tool.getAllCount() < count || tool.getCurrentCount() < count) {
+                throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because destroy count was bigger then number of tool");
+            }
+            tool.setCurrentCount(tool.getCurrentCount() - count);
+            tool.setAllCount(tool.getAllCount() - count);
+            this.setIsEnableIfToolIsUnique(tool, false);
+
+            tool.addDestructionOrderTool(destructionOrderTool);
+            destructionOrder.addDestroyedTool(destructionOrderTool);
+
+        });
+
+        Employee warehouseman = employeeService.getEmployeeByUsername(
+                authenticationFacade.getUsernameOfCurrentLoggedUser());
+        destructionOrder.setWarehouseman(warehouseman);
         destructionOrder.setId(id);
-        return destructionOrderRepository.save(destructionOrder);
+        DestructionOrder savedDestructionOrder = destructionOrderRepository.save(destructionOrder);
+        return destructionOrderMapper.destructionOrderToDestructionOrderDto(savedDestructionOrder);
     }
 
-    @Override
-    @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
-    public DestructionOrder patchDestructionOrder(Long id, DestructionOrder destructionOrder) {
-        return null;
+    private void setIsEnableIfToolIsUnique(Tool tool, boolean isEnable) {
+        if (tool.getIsUnique()) {
+            tool.setIsEnable(isEnable);
+        }
+    }
+
+    private boolean isAnyDestructionOrderToolForTool(List<DestructionOrderTool> destructionOrderTools, Tool tool) {
+        return destructionOrderTools.stream().anyMatch(destructionOrderTool -> destructionOrderTool.getTool().getId().equals(tool.getId()));
+    }
+
+    protected void discardPreviousDestructionChangesOnToolIfPresent(List<DestructionOrderTool> destructionOrderTools, Tool tool) {
+        destructionOrderTools.stream()
+                .filter(destructionOrderTool -> destructionOrderTool.getTool().getId().equals(tool.getId()))
+                .findFirst()
+                .ifPresent(destructionOrderTool -> undoDestructionChangesOnTool(tool, destructionOrderTool.getCount()));
+    }
+
+    protected void undoDestructionChangesOnTool(Tool tool, long count) {
+        if (!tool.getIsUnique() && !tool.getIsEnable()) {
+            throw new IllegalArgumentException("Cannot update destruction order, because " + tool.getName() + " tool was disabled");
+        }
+
+        tool.setCurrentCount(tool.getCurrentCount() + count);
+        tool.setAllCount(tool.getAllCount() + count);
+
+        this.setIsEnableIfToolIsUnique(tool, true);
     }
 }
