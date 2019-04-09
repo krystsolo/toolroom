@@ -70,6 +70,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers( "/login", "/generate-token", "user/logout").permitAll()
+                .antMatchers("/h2-console").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -77,12 +80,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
-        ;
 
         //configuration to allow start h2-console in browser
         //to delete in production
         http
                 .authorizeRequests()
+                .antMatchers("/h2-console").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/").permitAll()
                 .and()
