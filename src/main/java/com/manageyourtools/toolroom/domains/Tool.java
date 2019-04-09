@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode(of = "name")
 public class Tool {
 
     @Id
@@ -64,22 +64,28 @@ public class Tool {
     @JsonIgnore
     private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
 
-    public Tool addBuyOrderTool(BuyOrderTool buyOrderTool){
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
+    @JsonIgnore
+    private List<LendingReturnOrderTool> lendingReturnOrderTools = new ArrayList<>();
+
+    public void addBuyOrderTool(BuyOrderTool buyOrderTool){
         buyOrderTool.setTool(this);
         this.buyOrderTools.add(buyOrderTool);
-        return this;
     }
 
-    public Tool addDestructionOrderTool(DestructionOrderTool destructionOrderTool){
+    public void addDestructionOrderTool(DestructionOrderTool destructionOrderTool){
         destructionOrderTool.setTool(this);
         this.destructionOrderTools.add(destructionOrderTool);
-        return this;
     }
 
-    public Tool addLendingOrderTool(LendingOrderTool lendingOrderTool){
+    public void addLendingOrderTool(LendingOrderTool lendingOrderTool){
         lendingOrderTool.setTool(this);
         this.lendingOrderTools.add(lendingOrderTool);
-        return this;
+    }
+
+    public void addLendingReturnOrderTool(LendingReturnOrderTool lendingReturnOrderTool) {
+        lendingReturnOrderTool.setTool(this);
+        this.lendingReturnOrderTools.add(lendingReturnOrderTool);
     }
 
 }
