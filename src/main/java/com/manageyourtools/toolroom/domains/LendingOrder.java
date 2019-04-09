@@ -1,17 +1,23 @@
 package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "orderNumber")
 public class LendingOrder {
 
     @Id
@@ -21,43 +27,41 @@ public class LendingOrder {
     @CreationTimestamp
     private Timestamp pickTime;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lendingOrder")
-    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lendingOrder", orphanRemoval = true)
     private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
 
-    private Boolean isToReturn;
-
-    private Timestamp returnUntilTime;
+    private LocalDate returnUntilTime;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "pickWarehouseman_id")
-    private Employee pickWarehouseman;
+    @JoinColumn(name = "warehouseman_id")
+    private Employee warehouseman;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "worker_id")
     private Employee worker;
 
+    @NotNull
+    @Column(unique = true)
     private String orderNumber;
-
-    private Boolean isEdited;
 
     @UpdateTimestamp
     private Timestamp editTime;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private LendingReturnOrder lendingReturnOrder;
+
     private String description;
 
-    private Timestamp returnTime;
-
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "returnWarehouseman_id")
-    private Employee returnWarehouseman;
-
-    public LendingOrder addPickAndReturnTool(LendingOrderTool lendingOrderTool){
+    public LendingOrder addLendingOrderTool(LendingOrderTool lendingOrderTool){
         lendingOrderTool.setLendingOrder(this);
         this.lendingOrderTools.add(lendingOrderTool);
         return this;
+    }
+
+    public void addLendingReturnOrder(LendingReturnOrder lendingReturnOrder) {
+        this.lendingReturnOrder = lendingReturnOrder;
+        lendingReturnOrder.setLendingOrder(this);
     }
 }

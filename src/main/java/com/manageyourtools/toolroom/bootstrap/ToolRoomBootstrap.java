@@ -119,7 +119,7 @@ public class ToolRoomBootstrap implements CommandLineRunner {
         hammer.setIsUnique(true);
         hammer.setName("hammer");
         hammer.setUnitOfMeasure(UnitOfMeasure.PCS);
-        hammer = hammer.addBuyOrderTool(buyOrderToolRepository.getOne(1L));
+        hammer.addBuyOrderTool(buyOrderToolRepository.getOne(1L));
 
         Tool screwM6 = new Tool();
         screwM6.setAllCount(1000L);
@@ -128,9 +128,17 @@ public class ToolRoomBootstrap implements CommandLineRunner {
         screwM6.setIsUnique(false);
         screwM6.setName("screw M6x30");
         screwM6.setUnitOfMeasure(UnitOfMeasure.PCS);
-        screwM6 = screwM6.addBuyOrderTool(buyOrderToolRepository.getOne(2L));
+        screwM6.addBuyOrderTool(buyOrderToolRepository.getOne(2L));
 
-        return Arrays.asList(hammer, screwM6);
+        Tool drill = new Tool();
+        drill.setAllCount(100L);
+        drill.setCurrentCount(100L);
+        drill.setIsToReturn(true);
+        drill.setIsUnique(false);
+        drill.setName("drill");
+        drill.setUnitOfMeasure(UnitOfMeasure.PCS);
+
+        return Arrays.asList(hammer, screwM6, drill);
     }
 
     private BuyOrder getBuyOrder1(){
@@ -139,7 +147,7 @@ public class ToolRoomBootstrap implements CommandLineRunner {
 
         buyOrder.setOrderCode("orderCode");
 
-        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko"));
+        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko").get());
         buyOrder.setId(1L);
         buyOrder.addBuyOrderTool(getBuyOrderTools().get(0));
         buyOrder.addBuyOrderTool(getBuyOrderTools().get(1));
@@ -149,7 +157,7 @@ public class ToolRoomBootstrap implements CommandLineRunner {
     private BuyOrder getBuyOrder2(){
         BuyOrder buyOrder = new BuyOrder();
         buyOrder.setAddTimestamp(Timestamp.valueOf("2018-10-10 12:22:23"));
-        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko"));
+        buyOrder.setWarehouseman(employeeRepository.findByUserName("pko").get());
         buyOrder.setOrderCode("123");
         buyOrder.setId(2L);
 

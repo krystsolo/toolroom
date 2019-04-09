@@ -1,6 +1,8 @@
 package com.manageyourtools.toolroom.controllers;
 
+import com.manageyourtools.toolroom.api.model.LendingOrderDTO;
 import com.manageyourtools.toolroom.domains.LendingOrder;
+import com.manageyourtools.toolroom.domains.LendingReturnOrder;
 import com.manageyourtools.toolroom.services.LendingOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,28 +25,28 @@ public class LendingOrderController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public LendingOrder getLendingOrder(@PathVariable Long id){
+    public LendingOrderDTO getLendingOrder(@PathVariable Long id){
 
-        return lendingOrderService.findLendingOrderById(id);
+        return lendingOrderService.findLendingOrderDTOById(id);
     }
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<LendingOrder> getLendingOrders(){
+    public List<LendingOrderDTO> getLendingOrders(){
 
         return lendingOrderService.findAllLendingOrders();
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public LendingOrder addLendingOrder(@RequestBody LendingOrder lendingOrder){
+    public LendingOrderDTO addLendingOrder(@RequestBody LendingOrderDTO lendingOrder){
 
         return lendingOrderService.addLendingOrder(lendingOrder);
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public LendingOrder updateLendingOrder(@RequestBody LendingOrder lendingOrder, @PathVariable Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public LendingOrderDTO updateLendingOrder(@RequestBody LendingOrderDTO lendingOrder, @PathVariable Long id) {
 
         return lendingOrderService.updateLendingOrder(id, lendingOrder);
     }
@@ -54,12 +56,5 @@ public class LendingOrderController {
     public void deleteLendingOrder(@PathVariable Long id){
 
         lendingOrderService.deleteLendingOrder(id);
-    }
-
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public LendingOrder patchLendingOrder(@PathVariable Long id, @RequestBody LendingOrder lendingOrder) {
-
-        return lendingOrderService.patchLendingOrder(id, lendingOrder);
     }
 }

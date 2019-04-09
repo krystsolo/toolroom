@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "userName")
 public class Employee {
 
     private static final String ROLE_PREFIX = "ROLE_";

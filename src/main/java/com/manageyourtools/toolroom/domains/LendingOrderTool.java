@@ -1,26 +1,22 @@
 package com.manageyourtools.toolroom.domains;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.sql.Timestamp;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class LendingOrderTool {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Timestamp returnDate;
-
-    private Boolean isReturned;
-
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "returnWarehouseman_id")
-    private Employee returnWarehouseman;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
@@ -31,4 +27,7 @@ public class LendingOrderTool {
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "tool_id")
     private Tool tool;
+
+    @Min(1)
+    private int count;
 }
