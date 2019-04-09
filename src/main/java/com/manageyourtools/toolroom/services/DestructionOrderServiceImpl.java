@@ -62,33 +62,7 @@ public class DestructionOrderServiceImpl implements DestructionOrderService {
     public DestructionOrderDTO addDestructionOrder(DestructionOrderDTO destructionOrderDTO) {
 
         DestructionOrder destructionOrder = destructionOrderMapper.destructionOrderDtoToDestructionOrder(destructionOrderDTO);
-
-        List<DestructionOrderTool> destructionOrderTools = new ArrayList<>(destructionOrder.getDestructionOrderTools());
-        destructionOrderTools.forEach(destructionOrderTool -> {
-            long toolId = destructionOrderTool.getTool().getId();
-            Tool tool = toolService.findToolById(toolId);
-            if (!tool.getIsEnable()) {
-                throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because it was disabled");
-            }
-            long count = destructionOrderTool.getCount();
-            if (tool.getAllCount() < count || tool.getCurrentCount() < count) {
-                throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because destroy count was bigger then number of tool");
-            }
-            tool.setCurrentCount(tool.getCurrentCount() - count);
-            tool.setAllCount(tool.getAllCount() - count);
-            if (tool.getIsUnique()) {
-                tool.setIsEnable(false);
-            }
-
-            tool.addDestructionOrderTool(destructionOrderTool);
-            destructionOrder.addDestroyedTool(destructionOrderTool);
-        });
-
-        Employee warehouseman = employeeService.getEmployeeByUsername(
-                authenticationFacade.getUsernameOfCurrentLoggedUser());
-        destructionOrder.setWarehouseman(warehouseman);
-
-        DestructionOrder savedDestructionOrder = destructionOrderRepository.save(destructionOrder);
+        DestructionOrder savedDestructionOrder = saveDestructionOrder(destructionOrder);
         return destructionOrderMapper.destructionOrderToDestructionOrderDto(savedDestructionOrder);
     }
 
@@ -102,59 +76,76 @@ public class DestructionOrderServiceImpl implements DestructionOrderService {
         }
 
         DestructionOrder destructionOrder = destructionOrderMapper.destructionOrderDtoToDestructionOrder(destructionOrderDTO);
+        DestructionOrder savedDestructionOrder = changeFromPreviousDestructionOrderToNew(destructionOrderOptional.get(), destructionOrder);
+        return destructionOrderMapper.destructionOrderToDestructionOrderDto(savedDestructionOrder);
+    }
 
-        List<DestructionOrderTool> destructionOrderTools = new ArrayList<>(destructionOrder.getDestructionOrderTools());
+    private DestructionOrder saveDestructionOrder(DestructionOrder destructionOrder) {
+        checkAndCountToolsAfterDestructionOrder(destructionOrder);
 
-        List<DestructionOrderTool> previousDestructionOrderTools = destructionOrderOptional.get().getDestructionOrderTools();
+        Employee warehouseman = employeeService.getLoggedEmployee();
+        destructionOrder.setWarehouseman(warehouseman);
 
-        previousDestructionOrderTools.stream()
-                .filter(destructionOrderTool -> !isAnyDestructionOrderToolForTool(destructionOrderTools, destructionOrderTool.getTool()))
+        return destructionOrderRepository.save(destructionOrder);
+    }
+
+    private DestructionOrder changeFromPreviousDestructionOrderToNew(DestructionOrder previousDestructionOrder, DestructionOrder newDestructionOrder) {
+
+        restoreStateBeforeDestructionOrder(previousDestructionOrder);
+        checkAndCountToolsAfterDestructionOrder(newDestructionOrder);
+
+        newDestructionOrder.setWarehouseman(employeeService.getLoggedEmployee());
+        newDestructionOrder.setId(previousDestructionOrder.getId());
+        return destructionOrderRepository.save(newDestructionOrder);
+    }
+
+    private void restoreStateBeforeDestructionOrder(DestructionOrder previousDestructionOrder) {
+        previousDestructionOrder.getDestructionOrderTools()
                 .forEach(destructionOrderTool -> {
                     Tool tool = destructionOrderTool.getTool();
                     undoDestructionChangesOnTool(tool, destructionOrderTool.getCount());
                 });
+    }
 
+    private void checkAndCountToolsAfterDestructionOrder(DestructionOrder newDestructionOrder) {
+        makeBidirectionalRelations(newDestructionOrder);
+
+        newDestructionOrder.getDestructionOrderTools()
+                .forEach(destructionOrderTool -> {
+                    Tool tool = destructionOrderTool.getTool();
+                    checkIfToolIsEnable(tool);
+                    long count = destructionOrderTool.getCount();
+                    if (tool.getAllCount() < count || tool.getCurrentCount() < count) {
+                        throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because destroy count was bigger then number of tool");
+                    }
+                    tool.setCurrentCount(tool.getCurrentCount() - count);
+                    tool.setAllCount(tool.getAllCount() - count);
+                    this.setIsEnableIfToolIsUnique(tool, false);
+                }
+        );
+    }
+
+    private void makeBidirectionalRelations(DestructionOrder destructionOrder) {
+        List<DestructionOrderTool> destructionOrderTools = new ArrayList<>(destructionOrder.getDestructionOrderTools());
+        destructionOrder.setDestructionOrderTools(new ArrayList<>());
         destructionOrderTools.forEach(destructionOrderTool -> {
             long toolId = destructionOrderTool.getTool().getId();
             Tool tool = toolService.findToolById(toolId);
-
-            this.discardPreviousDestructionChangesOnToolIfPresent(previousDestructionOrderTools, tool);
-            long count = destructionOrderTool.getCount();
-            if (tool.getAllCount() < count || tool.getCurrentCount() < count) {
-                throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because destroy count was bigger then number of tool");
-            }
-            tool.setCurrentCount(tool.getCurrentCount() - count);
-            tool.setAllCount(tool.getAllCount() - count);
-            this.setIsEnableIfToolIsUnique(tool, false);
-
             tool.addDestructionOrderTool(destructionOrderTool);
             destructionOrder.addDestroyedTool(destructionOrderTool);
-
         });
+    }
 
-        Employee warehouseman = employeeService.getEmployeeByUsername(
-                authenticationFacade.getUsernameOfCurrentLoggedUser());
-        destructionOrder.setWarehouseman(warehouseman);
-        destructionOrder.setId(id);
-        DestructionOrder savedDestructionOrder = destructionOrderRepository.save(destructionOrder);
-        return destructionOrderMapper.destructionOrderToDestructionOrderDto(savedDestructionOrder);
+    private void checkIfToolIsEnable(Tool tool) {
+        if (!tool.getIsEnable()) {
+            throw new IllegalArgumentException("Cannot destroy " + tool.getName() + " tool, because it was disabled");
+        }
     }
 
     private void setIsEnableIfToolIsUnique(Tool tool, boolean isEnable) {
         if (tool.getIsUnique()) {
             tool.setIsEnable(isEnable);
         }
-    }
-
-    private boolean isAnyDestructionOrderToolForTool(List<DestructionOrderTool> destructionOrderTools, Tool tool) {
-        return destructionOrderTools.stream().anyMatch(destructionOrderTool -> destructionOrderTool.getTool().getId().equals(tool.getId()));
-    }
-
-    protected void discardPreviousDestructionChangesOnToolIfPresent(List<DestructionOrderTool> destructionOrderTools, Tool tool) {
-        destructionOrderTools.stream()
-                .filter(destructionOrderTool -> destructionOrderTool.getTool().getId().equals(tool.getId()))
-                .findFirst()
-                .ifPresent(destructionOrderTool -> undoDestructionChangesOnTool(tool, destructionOrderTool.getCount()));
     }
 
     protected void undoDestructionChangesOnTool(Tool tool, long count) {
