@@ -41,17 +41,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee getEmployeeByUsername(String username) {
 
-        return employeeRepository.findByUserName(username).orElseThrow(ResourceNotFoundException::new);
+        return employeeRepository.findByUserName(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with username=" +  username + " not found"));
     }
 
     @Override
     public EmployeeShortDTO getShortInfoAboutEmployeeById(Long id) {
-        return employeeRepository.findById(id).map(employeeMapper::employeeToEmployeeShortDTO).orElseThrow(ResourceNotFoundException::new);
+        return employeeRepository.findById(id)
+                .map(employeeMapper::employeeToEmployeeShortDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id=" +  id + " not found"));
     }
 
     @Override
     public List<EmployeeShortDTO> getEmployees() {
-        return employeeRepository.findAll().stream().map(employeeMapper::employeeToEmployeeShortDTO).collect(Collectors.toList());
+        return employeeRepository.findAll()
+                .stream()
+                .map(employeeMapper::employeeToEmployeeShortDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -68,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     return employeeMapper.employeeToEmployeeDTO(savedEmployee);
                 }
         )
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id=" +  id + " not found"));
     }
 
     @Override
@@ -100,7 +106,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public Employee getEmployeeById(Long id) {
-        return employeeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id=" +  id + " not found"));
     }
 
     public Employee getLoggedEmployee() {

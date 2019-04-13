@@ -51,7 +51,9 @@ public class BuyOrderServiceImpl implements BuyOrderService {
 
     @Override
     public BuyOrderDTO findBuyOrderById(Long id) {
-        return buyOrderRepository.findById(id).map(buyOrderMapper::buyOrderToBuyOrderDTO).orElseThrow(ResourceNotFoundException::new);
+        return buyOrderRepository.findById(id)
+                .map(buyOrderMapper::buyOrderToBuyOrderDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("There is no buy order with id=" + id));
     }
 
     @Override

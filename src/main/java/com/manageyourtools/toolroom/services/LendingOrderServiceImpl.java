@@ -49,7 +49,7 @@ public class LendingOrderServiceImpl implements LendingOrderService {
     @Override
     public LendingOrder findLendingOrderById(Long id) {
         return lendingOrderRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Lending order with id=" +  id + " not found"));
     }
 
     @Override

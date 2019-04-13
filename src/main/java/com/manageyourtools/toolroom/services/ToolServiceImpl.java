@@ -37,7 +37,8 @@ public class ToolServiceImpl implements ToolService {
 
     @Override
     public Tool findToolById(Long id) {
-        return toolRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return toolRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool with id=" +  id + " not found"));
     }
 
     @Override

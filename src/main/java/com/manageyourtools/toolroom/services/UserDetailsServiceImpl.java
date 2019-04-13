@@ -32,7 +32,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Employee employee = employeeRepository.findByUserName(username).orElseThrow(ResourceNotFoundException::new);
+        Employee employee = employeeRepository.findByUserName(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with username=" +  username + " not found"));
 
 
         if(!employee.getIsActive()) {

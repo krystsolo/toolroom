@@ -19,7 +19,8 @@ public class ToolImageServiceImpl implements ToolImageService {
 
     @Override
     public void uploadImage(MultipartFile file, Long toolId) {
-        Tool tool = toolRepository.findById(toolId).orElseThrow(ResourceNotFoundException::new);
+        Tool tool = toolRepository.findById(toolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool with id=" +  toolId + " not found"));
 
         try {
             tool.setImage(file.getBytes());
@@ -32,7 +33,8 @@ public class ToolImageServiceImpl implements ToolImageService {
 
     @Override
     public byte[] getImage(Long toolId) {
-        Tool tool = toolRepository.findById(toolId).orElseThrow(ResourceNotFoundException::new);
+        Tool tool = toolRepository.findById(toolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tool with id=" +  toolId + " not found"));
         if(tool.getImage() == null){
             throw new ResourceNotFoundException("There is no image in DB for this tool");
         }

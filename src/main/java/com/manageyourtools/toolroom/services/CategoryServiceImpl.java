@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryRepository.findById(id)
                 .map(categoryMapper::categoryToCategoryDTO)
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id=" + id + " not found"));
     }
 
     @Override

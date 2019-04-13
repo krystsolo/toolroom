@@ -37,12 +37,17 @@ public class DestructionOrderServiceImpl implements DestructionOrderService {
 
     @Override
     public List<DestructionOrderDTO> findAllDestructionOrders() {
-        return destructionOrderRepository.findAll().stream().map(destructionOrderMapper::destructionOrderToDestructionOrderDto).collect(Collectors.toList());
+        return destructionOrderRepository.findAll()
+                .stream()
+                .map(destructionOrderMapper::destructionOrderToDestructionOrderDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public DestructionOrderDTO findDestructionOrderById(Long id) {
-        return destructionOrderRepository.findById(id).map(destructionOrderMapper::destructionOrderToDestructionOrderDto).orElseThrow(ResourceNotFoundException::new);
+        return destructionOrderRepository.findById(id)
+                .map(destructionOrderMapper::destructionOrderToDestructionOrderDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Destruction order with id=" + id + " not found"));
     }
 
     @Override

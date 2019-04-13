@@ -25,7 +25,8 @@ public class EmployeeImageServiceImpl implements EmployeeImageService {
     @Transactional
     public void uploadImage(MultipartFile file, Long employeeId) {
 
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(ResourceNotFoundException::new);
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee wih id=" + employeeId + " not found"));
 
         try {
             employee.setImage(file.getBytes());
@@ -38,7 +39,8 @@ public class EmployeeImageServiceImpl implements EmployeeImageService {
 
     @Override
     public byte[] getImage(Long id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee wih id=" + id + " not found"));
         if(employee.getImage() == null){
             throw new ResourceNotFoundException("There is no image in DB for this employee");
         }
