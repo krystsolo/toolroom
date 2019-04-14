@@ -109,6 +109,7 @@ public class LendingOrderServiceImpl implements LendingOrderService {
         lendingOrder.getLendingOrderTools().forEach(this::checkAndCalculateToolCount);
 
         Employee worker = employeeService.getEmployeeById(lendingOrder.getWorker().getId());
+        checkIfEmployeeIsActive(worker);
         lendingOrder.setWorker(worker);
         Employee warehouseman = employeeService.getLoggedEmployee();
         lendingOrder.setWarehouseman(warehouseman);
@@ -131,6 +132,12 @@ public class LendingOrderServiceImpl implements LendingOrderService {
         } else {
             lendingOrder.setLendingReturnOrder(null);
             lendingOrder.setReturnUntilTime(null);
+        }
+    }
+
+    private void checkIfEmployeeIsActive(Employee worker) {
+        if (!worker.getIsActive()) {
+            throw new IllegalArgumentException("Worker must be active! Employee=" + worker.getUserName() + " is inactive");
         }
     }
 
