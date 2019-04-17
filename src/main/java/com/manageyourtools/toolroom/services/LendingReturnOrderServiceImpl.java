@@ -9,6 +9,7 @@ import com.manageyourtools.toolroom.repositories.LendingReturnOrderRepository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +123,15 @@ public class LendingReturnOrderServiceImpl implements LendingReturnOrderService 
     @Override
     public List<LendingReturnOrderDTO> getAllOrders() {
         return lendingReturnOrderRepository.findAll().stream()
+                .map(lendingReturnOrderMapper::lendingReturnOrderToLendingReturnOrderDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LendingReturnOrderDTO> getAllOrdersNotReturnedOnTime() {
+        return this.lendingReturnOrderRepository.findAll()
+                .stream()
+                .filter(l -> !l.getIsReturned() && l.getReturnUntilTime().isBefore(LocalDate.now()))
                 .map(lendingReturnOrderMapper::lendingReturnOrderToLendingReturnOrderDTO)
                 .collect(Collectors.toList());
     }

@@ -10,4 +10,6 @@ public interface LendingReturnOrderService {
     LendingReturnOrderDTO getLendingReturnOrderDTO(Long id);
 
     List<LendingReturnOrderDTO> getAllOrders();
+
+    List<LendingReturnOrderDTO> getAllOrdersNotReturnedOnTime();
 }
