@@ -72,6 +72,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers( "/login", "/generate-token", "user/logout").permitAll()
                 .antMatchers("/h2-console").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
+                .antMatchers(AUTH_LIST).permitAll()
                 .antMatchers("/").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -93,6 +94,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     }
 
-
+    private static final String[] AUTH_LIST = {
+            // -- swagger ui
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
 
 }
