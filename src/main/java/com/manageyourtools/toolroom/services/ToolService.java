@@ -15,4 +15,8 @@ public interface ToolService {
     ToolDTO saveTool(ToolDTO toolDTO);
     ToolDTO updateTool(Long id, ToolDTO toolDTO);
     void deleteTool(Long id);
+
+    List<ToolDTO> findToolsWithCloseWarrantyTime(String warranty);
+
+    List<ToolDTO> getToolsWithCountSmallerThanMinimal();
 }

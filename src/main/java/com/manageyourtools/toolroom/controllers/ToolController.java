@@ -4,9 +4,11 @@ import com.manageyourtools.toolroom.api.model.ToolDTO;
 
 import com.manageyourtools.toolroom.services.ToolService;
 
+import org.apache.tomcat.jni.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,16 @@ public class ToolController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<ToolDTO> getTools(){
-
+    public List<ToolDTO> getTools(@RequestParam(required = false, defaultValue = "") String warranty,
+                                  @RequestParam(required = false, defaultValue = "false") boolean toolsShortages){
+        if (!warranty.isEmpty() && toolsShortages) {
+            throw new IllegalArgumentException("Not invalid parameters combination for tools find");
+        }
+        if (!warranty.isEmpty()) {
+            return toolService.findToolsWithCloseWarrantyTime(warranty);
+        } else if (toolsShortages) {
+            return toolService.getToolsWithCountSmallerThanMinimal();
+        }
         return toolService.findAllTools();
     }
 

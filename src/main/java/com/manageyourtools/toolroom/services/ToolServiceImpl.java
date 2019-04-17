@@ -8,6 +8,7 @@ import com.manageyourtools.toolroom.repositories.ToolRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -94,5 +95,32 @@ public class ToolServiceImpl implements ToolService {
                 toolRepository.deleteById(id);
             }
         });
+    }
+
+    @Override
+    public List<ToolDTO> findToolsWithCloseWarrantyTime(String warranty) {
+        LocalDate warrantyDate;
+        if (warranty.equals("week")) {
+            warrantyDate = LocalDate.now().minusDays(7);
+        } else if (warranty.equals("month")) {
+            warrantyDate = LocalDate.now().minusMonths(1);
+        } else if (warranty.equals("threemonths")){
+            warrantyDate = LocalDate.now().minusMonths(3);
+        } else {
+            throw new IllegalArgumentException("Not valid warranty date option");
+        }
+        return toolRepository.findAllByWarrantyDateBefore(warrantyDate)
+                .stream()
+                .map(toolMapper::toolToToolDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ToolDTO> getToolsWithCountSmallerThanMinimal() {
+        return toolRepository.findAll()
+                .stream()
+                .filter(tool -> tool.getMinimalCount() != null && tool.getMinimalCount() > tool.getAllCount())
+                .map(toolMapper::toolToToolDTO)
+                .collect(Collectors.toList());
     }
 }
