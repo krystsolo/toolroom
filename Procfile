@@ -1,0 +1,1 @@
+web: java $JAVA_OPTS -jar target/*.jar --p $PORT -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.url=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.url=${SPRING_DATASOURCE_PASSWORD }

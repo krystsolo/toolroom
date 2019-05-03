@@ -40,6 +40,11 @@ public class BuyOrderServiceIT {
     @Autowired
     BuyOrderToolRepository buyOrderToolRepository;
 
+    @Autowired
+            EmployeeService employeeService;
+    @Autowired
+            ToolService toolService;
+
     BuyOrderServiceImpl buyOrderService;
 
     @Before
@@ -51,14 +56,14 @@ public class BuyOrderServiceIT {
 
         toolRoomBootstrap.run();
         buyOrderService = new BuyOrderServiceImpl(buyOrderRepository, new AuthenticationFacadeImpl(),
-                employeeRepository, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolRepository);
+                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService);
     }
 
     @Test
     @Transactional
     public void deleteBuyOrder() {
         BuyOrder buyOrder = buyOrderRepository.getOne(1L);
-        BuyOrderTool buyOrderTool = buyOrder.getBuyOrderTools().get(1);
+        BuyOrderTool buyOrderTool = buyOrder.getBuyOrderTools().iterator().next();
         Tool tool = buyOrderTool.getTool();
 
         buyOrderService.deleteBuyOrder(1L);

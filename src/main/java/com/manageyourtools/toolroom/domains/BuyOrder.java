@@ -10,7 +10,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -33,12 +35,11 @@ public class BuyOrder {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "buyOrder")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "buyOrder")
     @JsonIgnore
-    private List<BuyOrderTool> buyOrderTools = new ArrayList<>();
+    private Set<BuyOrderTool> buyOrderTools = new HashSet<>();
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 

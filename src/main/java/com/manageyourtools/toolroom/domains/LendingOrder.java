@@ -3,6 +3,8 @@ package com.manageyourtools.toolroom.domains;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.Nullable;
 
@@ -27,7 +29,8 @@ public class LendingOrder {
     @CreationTimestamp
     private Timestamp pickTime;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lendingOrder", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "lendingOrder", orphanRemoval = true)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
 
     private LocalDate returnUntilTime;

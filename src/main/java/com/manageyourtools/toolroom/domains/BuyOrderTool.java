@@ -1,6 +1,7 @@
 package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,19 +13,18 @@ import javax.validation.constraints.Min;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "id")
 public class BuyOrderTool {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "tool_id")
     private Tool tool;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "buyOrder_id")
     @JsonIgnore
     private BuyOrder buyOrder;

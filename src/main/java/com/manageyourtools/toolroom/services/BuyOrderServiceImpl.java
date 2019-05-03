@@ -110,7 +110,7 @@ public class BuyOrderServiceImpl implements BuyOrderService {
 
     protected void checkAndCountToolsFromOrder(BuyOrder buyOrder) {
 
-        List<BuyOrderTool> buyOrderTools = new ArrayList<>(buyOrder.getBuyOrderTools());
+        Set<BuyOrderTool> buyOrderTools = new HashSet<>(buyOrder.getBuyOrderTools());
 
         checkIfThereIsNoToolRepeat(buyOrderTools);
 
@@ -136,7 +136,7 @@ public class BuyOrderServiceImpl implements BuyOrderService {
         return buyOrderRepository.save(buyOrder);
     }
 
-    protected void decreaseToolCountIfWasInPreviousBuyOrder(List<BuyOrderTool> previousBuyOrderTools, Tool tool) {
+    protected void decreaseToolCountIfWasInPreviousBuyOrder(Set<BuyOrderTool> previousBuyOrderTools, Tool tool) {
         previousBuyOrderTools.stream()
                 .filter(buyOrderTool -> buyOrderTool.getTool().getId().equals(tool.getId()))
                 .findFirst()
@@ -185,15 +185,15 @@ public class BuyOrderServiceImpl implements BuyOrderService {
         }
     }
 
-    protected void checkIfThereIsNoToolRepeat(List<BuyOrderTool> buyOrderTools) {
-        List<Long> tools = buyOrderTools.stream().map(buyOrderTool -> buyOrderTool.getTool().getId()).collect(Collectors.toList());
+    protected void checkIfThereIsNoToolRepeat(Set<BuyOrderTool> buyOrderTools) {
+        Set<Long> tools = buyOrderTools.stream().map(buyOrderTool -> buyOrderTool.getTool().getId()).collect(Collectors.toSet());
         if (!containsUnique(tools)) {
             throw new IllegalArgumentException("There are more than one buyOrderTool for one specific tool");
         }
     }
 
-    protected <T> boolean containsUnique(List<T> list) {
-        return list.stream().allMatch(new HashSet<>()::add);
+    protected <T> boolean containsUnique(Set<T> set) {
+        return set.stream().allMatch(new HashSet<>()::add);
     }
 
 }

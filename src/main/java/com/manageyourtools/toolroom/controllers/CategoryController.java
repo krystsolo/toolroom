@@ -3,6 +3,7 @@ package com.manageyourtools.toolroom.controllers;
 import com.manageyourtools.toolroom.api.model.CategoryDTO;
 import com.manageyourtools.toolroom.services.CategoryService;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -26,9 +27,9 @@ public class CategoryController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDTO> getCategories(Sort sort){
+    public List<CategoryDTO> getCategories(){
 
-        return categoryService.findAllCategories(sort);
+        return categoryService.findAllCategories();
     }
 
     @PostMapping("")

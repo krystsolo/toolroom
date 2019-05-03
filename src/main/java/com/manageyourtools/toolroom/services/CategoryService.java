@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CategoryService {
 
-    List<CategoryDTO> findAllCategories(Sort sort);
+    List<CategoryDTO> findAllCategories();
     CategoryDTO findCategoryById(Long id);
     void deleteCategory(Long id);
     CategoryDTO addCategory(CategoryDTO categoryDTO);

@@ -5,11 +5,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -31,7 +31,8 @@ public class LendingReturnOrder {
     @CreationTimestamp
     private Timestamp pickTime;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lendingReturnOrder", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "lendingReturnOrder", orphanRemoval = true)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
     private List<LendingReturnOrderTool> lendingReturnOrderTools = new ArrayList<>();
 

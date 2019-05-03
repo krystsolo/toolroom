@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDTO> findAllCategories(Sort sort) {
+    public List<CategoryDTO> findAllCategories() {
 
         return categoryRepository.findAll()
                 .stream()

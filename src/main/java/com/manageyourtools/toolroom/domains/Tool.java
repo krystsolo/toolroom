@@ -32,7 +32,7 @@ public class Tool {
     private UnitOfMeasure unitOfMeasure;
     private Long allCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 

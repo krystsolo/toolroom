@@ -7,14 +7,8 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.data.web.config.HateoasAwareSpringDataWebConfiguration;
-import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,14 +20,12 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Import(HateoasAwareSpringDataWebConfiguration.class)
 public class EmployeeControllerTest {
 
     @Mock
@@ -83,35 +75,13 @@ public class EmployeeControllerTest {
 
     @Test
     public void getEmployee() throws Exception {
-        EmployeeDTO employee = getTestData().get(0);
 
-        Resource<EmployeeDTO> employeeResource = new Resource<>(employee);
-        when(employeeService.getEmployeeById(anyLong())).thenReturn(employee);
-
-
-        mockMvc.perform(get(EmployeeController.BASE_URL + "/0")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userName", equalTo("pko")));
 
     }
 
     @Test
     public void getEmployees() throws Exception {
-        List<EmployeeDTO> employees = getTestData();
 
-        List<Resource<EmployeeDTO>> employeeResource = employees.stream().map(employee -> new Resource<>(employee)).collect(Collectors.toList());
-
-        when(employeeService.getEmployees()).thenReturn(employees);
-
-
-
-        mockMvc.perform(get(EmployeeController.BASE_URL)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.employeeList", hasSize(2)));
     }
 
     @Test

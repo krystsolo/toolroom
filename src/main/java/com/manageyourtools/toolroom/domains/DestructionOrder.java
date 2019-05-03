@@ -33,7 +33,7 @@ public class DestructionOrder {
     @UpdateTimestamp
     private Timestamp editTimestamp;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "destructionOrder", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "destructionOrder", orphanRemoval = true)
     @JsonIgnore
     private List<DestructionOrderTool> destructionOrderTools = new ArrayList<>();
 
