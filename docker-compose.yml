@@ -1,0 +1,36 @@
+version: '3'
+services:
+    spring:
+      build: ./toolroom
+      ports:
+        - "8080:8080"
+      links:
+        - db
+      depends_on:
+        - db
+      restart: on-failure
+    client:
+      build: ./toolroom-front
+      ports:
+        - "4200:80"
+      links: 
+        - spring
+      # volumes:
+        # - ./angular-client:/app
+      depends_on:
+        - spring
+    db:
+      image: mysql
+      command: --default-authentication-plugin=mysql_native_password
+      #restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_USER: user
+        MYSQL_PASSWORD: password
+        MYSQL_DATABASE: toolroomdb
+      ports:
+        - '3306:3306'
+      expose:
+        - '3306'
+      # volumes:
+        # - ./my-db:/var/lib/mysql

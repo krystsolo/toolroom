@@ -9,10 +9,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.sql.Array;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -34,12 +31,15 @@ public class BuyOrderServiceTest {
     @Mock
     ToolService toolService;
 
+    @Mock
+    ToolRepository toolRepository;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         buyOrderService = new BuyOrderServiceImpl(buyOrderRepository, new AuthenticationFacadeImpl(),
-                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService);
+                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService, toolRepository);
     }
 
     private BuyOrder getBuyOrder1(){

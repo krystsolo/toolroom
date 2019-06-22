@@ -14,14 +14,14 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-//@EqualsAndHashCode(of = "orderNumber")
+@EqualsAndHashCode(of = "orderNumber")
 public class LendingReturnOrder {
 
     @Id
@@ -32,16 +32,15 @@ public class LendingReturnOrder {
     private Timestamp pickTime;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "lendingReturnOrder", orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    //@Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
-    private List<LendingReturnOrderTool> lendingReturnOrderTools = new ArrayList<>();
+    private Set<LendingReturnOrderTool> lendingReturnOrderTools = new HashSet<>();
 
     private LocalDate returnUntilTime;
 
     private Boolean isReturned = false;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "worker_id")
     private Employee worker;
 
@@ -60,18 +59,12 @@ public class LendingReturnOrder {
             CascadeType.DETACH, CascadeType.REFRESH})
     private LendingOrder lendingOrder;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "returnWarehouseman_id")
     private Employee returnWarehouseman;
 
     public void addLendingReturnOrderTool(LendingReturnOrderTool lendingReturnOrderTool){
         lendingReturnOrderTool.setLendingReturnOrder(this);
         this.lendingReturnOrderTools.add(lendingReturnOrderTool);
-    }
-
-    public void removeLendingReturnOrderTool(LendingReturnOrderTool lendingReturnOrderTool) {
-        lendingReturnOrderTool.setLendingReturnOrder(null);
-        this.lendingReturnOrderTools.remove(lendingReturnOrderTool);
     }
 }

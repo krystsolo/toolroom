@@ -1,7 +1,7 @@
 package com.manageyourtools.toolroom.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,12 +12,15 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "orderCode")
 public class DestructionOrder {
 
     @Id
@@ -25,6 +28,7 @@ public class DestructionOrder {
     private Long id;
 
     @NotNull
+    @Column(unique = true)
     private String orderCode;
 
     @CreationTimestamp
@@ -35,10 +39,9 @@ public class DestructionOrder {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "destructionOrder", orphanRemoval = true)
     @JsonIgnore
-    private List<DestructionOrderTool> destructionOrderTools = new ArrayList<>();
+    private Set<DestructionOrderTool> destructionOrderTools = new HashSet<>();
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 
@@ -48,10 +51,5 @@ public class DestructionOrder {
         this.destructionOrderTools.add(destructionOrderTool);
         destructionOrderTool.setDestructionOrder(this);
         return this;
-    }
-
-    public void removeDestructionOrderTool(DestructionOrderTool destructionOrderTool) {
-        this.destructionOrderTools.remove(destructionOrderTool);
-        destructionOrderTool.setDestructionOrder(null);
     }
 }

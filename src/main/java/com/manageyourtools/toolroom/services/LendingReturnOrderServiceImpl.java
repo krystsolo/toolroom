@@ -7,12 +7,15 @@ import com.manageyourtools.toolroom.domains.*;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.LendingReturnOrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +35,7 @@ public class LendingReturnOrderServiceImpl implements LendingReturnOrderService 
     }
 
     @Override
+    @Transactional
     public LendingReturnOrderDTO returnLendingOrder(Long id, LendingReturnOrderDTO lendingReturnOrderDTO) {
 
         LendingReturnOrder previousLendingReturnOrder = getLendingReturnOrder(id);
@@ -44,7 +48,7 @@ public class LendingReturnOrderServiceImpl implements LendingReturnOrderService 
     private LendingReturnOrder saveLendingReturnOrder(LendingReturnOrder previousLendingReturnOrder, LendingReturnOrder lendingReturnOrder) {
         lendingReturnOrder.setId(previousLendingReturnOrder.getId());
 
-        List<LendingReturnOrderTool> lendingReturnOrderTools = new ArrayList<>(lendingReturnOrder.getLendingReturnOrderTools());
+        Set<LendingReturnOrderTool> lendingReturnOrderTools = new HashSet<>(lendingReturnOrder.getLendingReturnOrderTools());
         Employee warehouseman = employeeService.getLoggedEmployee();
 
         lendingReturnOrderTools.forEach(lendingReturnOrderTool -> {
@@ -94,11 +98,11 @@ public class LendingReturnOrderServiceImpl implements LendingReturnOrderService 
         }
     }
 
-    private boolean isAllToolsReturned(List<LendingReturnOrderTool> lendingReturnOrderTools) {
+    private boolean isAllToolsReturned(Set<LendingReturnOrderTool> lendingReturnOrderTools) {
         return lendingReturnOrderTools.stream().allMatch(LendingReturnOrderTool::getIsReturned);
     }
 
-    private LendingReturnOrderTool findLendingReturnOrderToolFromList(LendingReturnOrderTool lendingReturnOrderTool, List<LendingReturnOrderTool> lendingReturnOrderTools) {
+    private LendingReturnOrderTool findLendingReturnOrderToolFromList(LendingReturnOrderTool lendingReturnOrderTool, Set<LendingReturnOrderTool> lendingReturnOrderTools) {
         return lendingReturnOrderTools.stream()
                 .filter(l -> l.getTool().getId().equals(lendingReturnOrderTool.getTool().getId()))
                 .findFirst()

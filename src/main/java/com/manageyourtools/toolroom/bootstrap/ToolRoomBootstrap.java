@@ -4,6 +4,7 @@ import com.manageyourtools.toolroom.domains.*;
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 @Component
+@Profile("default")
 public class ToolRoomBootstrap implements CommandLineRunner {
 
     private final EmployeeRepository employeeRepository;

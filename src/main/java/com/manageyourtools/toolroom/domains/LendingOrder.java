@@ -1,19 +1,15 @@
 package com.manageyourtools.toolroom.domains;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,18 +26,16 @@ public class LendingOrder {
     private Timestamp pickTime;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "lendingOrder", orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
+    //@Fetch(value = FetchMode.SUBSELECT)
+    private Set<LendingOrderTool> lendingOrderTools = new HashSet<>();
 
     private LocalDate returnUntilTime;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "warehouseman_id")
     private Employee warehouseman;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "worker_id")
     private Employee worker;
 
@@ -53,6 +47,7 @@ public class LendingOrder {
     private Timestamp editTime;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private LendingReturnOrder lendingReturnOrder;
 
     private String description;

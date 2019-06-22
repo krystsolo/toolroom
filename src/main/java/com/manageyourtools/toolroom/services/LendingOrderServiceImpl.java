@@ -8,10 +8,9 @@ import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import com.manageyourtools.toolroom.repositories.LendingOrderRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.manageyourtools.toolroom.services.UserDetailsServiceImpl.HAS_ROLE_WAREHOUSEMAN;
@@ -54,6 +53,7 @@ public class LendingOrderServiceImpl implements LendingOrderService {
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    @Transactional
     public void deleteLendingOrder(Long id) {
         lendingOrderRepository.findById(id).ifPresent(lendingOrder -> {
 
@@ -75,6 +75,7 @@ public class LendingOrderServiceImpl implements LendingOrderService {
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    @Transactional
     public LendingOrderDTO addLendingOrder(LendingOrderDTO lendingOrderDTO) {
 
         LendingOrder lendingOrder = lendingOrderMapper.lendingOrderDTOToLendingOrder(lendingOrderDTO);
@@ -85,6 +86,7 @@ public class LendingOrderServiceImpl implements LendingOrderService {
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    @Transactional
     public LendingOrderDTO updateLendingOrder(Long id, LendingOrderDTO lendingOrderDTO) {
 
         Optional<LendingOrder> previousLendingOrder = this.lendingOrderRepository.findById(id);
@@ -114,7 +116,7 @@ public class LendingOrderServiceImpl implements LendingOrderService {
         Employee warehouseman = employeeService.getLoggedEmployee();
         lendingOrder.setWarehouseman(warehouseman);
 
-        List<LendingOrderTool> toReturn =
+        Set<LendingOrderTool> toReturn =
                 getLendingToolsToReturn(lendingOrder.getLendingOrderTools());
 
         if (toReturn.size() > 0) {
@@ -141,16 +143,16 @@ public class LendingOrderServiceImpl implements LendingOrderService {
         }
     }
 
-    private List<LendingOrderTool> getLendingToolsToReturn(List<LendingOrderTool> lendingOrderTools) {
+    private Set<LendingOrderTool> getLendingToolsToReturn(Set<LendingOrderTool> lendingOrderTools) {
         return lendingOrderTools
                 .stream()
                 .filter(lendingOrderTool -> lendingOrderTool.getTool().getIsToReturn())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     private void makeBidirectionalRelations(LendingOrder lendingOrder) {
         List<LendingOrderTool> lendingOrderTools = new ArrayList<>(lendingOrder.getLendingOrderTools());
-        lendingOrder.setLendingOrderTools(new ArrayList<>());
+        lendingOrder.setLendingOrderTools(new HashSet<>());
         lendingOrderTools.forEach(lendingOrderTool -> {
             Tool tool = toolService.findToolById(lendingOrderTool.getTool().getId());
             tool.addLendingOrderTool(lendingOrderTool);

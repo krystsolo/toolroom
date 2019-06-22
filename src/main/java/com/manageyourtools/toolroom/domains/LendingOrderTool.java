@@ -1,17 +1,18 @@
 package com.manageyourtools.toolroom.domains;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import java.sql.Timestamp;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "id")
 public class LendingOrderTool {
 
     @Id
@@ -23,8 +24,7 @@ public class LendingOrderTool {
     @JoinColumn(name = "lendingOrder_id")
     private LendingOrder lendingOrder;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "tool_id")
     private Tool tool;
 

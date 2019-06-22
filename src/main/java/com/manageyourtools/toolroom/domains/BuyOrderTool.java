@@ -24,7 +24,8 @@ public class BuyOrderTool {
     @JoinColumn(name = "tool_id")
     private Tool tool;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "buyOrder_id")
     @JsonIgnore
     private BuyOrder buyOrder;

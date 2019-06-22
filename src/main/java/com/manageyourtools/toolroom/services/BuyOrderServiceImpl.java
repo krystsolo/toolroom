@@ -30,10 +30,11 @@ public class BuyOrderServiceImpl implements BuyOrderService {
     private final DestructionOrderToolRepository destructionOrderToolRepository;
     private final BuyOrderMapper buyOrderMapper;
     private final ToolService toolService;
+    private final ToolRepository toolRepository;
 
     public BuyOrderServiceImpl(BuyOrderRepository buyOrderRepository, AuthenticationFacade authenticationFacade,
                                EmployeeService employeeService, LendingOrderToolRepository lendingOrderToolRepository,
-                               DestructionOrderToolRepository destructionOrderToolRepository, BuyOrderMapper buyOrderMapper, ToolService toolService) {
+                               DestructionOrderToolRepository destructionOrderToolRepository, BuyOrderMapper buyOrderMapper, ToolService toolService, ToolRepository toolRepository) {
         this.buyOrderRepository = buyOrderRepository;
         this.authenticationFacade = authenticationFacade;
         this.employeeService = employeeService;
@@ -41,6 +42,7 @@ public class BuyOrderServiceImpl implements BuyOrderService {
         this.destructionOrderToolRepository = destructionOrderToolRepository;
         this.buyOrderMapper = buyOrderMapper;
         this.toolService = toolService;
+        this.toolRepository = toolRepository;
     }
 
     @Override
@@ -69,6 +71,7 @@ public class BuyOrderServiceImpl implements BuyOrderService {
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    @Transactional
     public BuyOrderDTO addBuyOrder(BuyOrderDTO buyOrderDTO) throws IllegalArgumentException {
         BuyOrder buyOrder = buyOrderMapper.buyOrderDtoToBuyOrder(buyOrderDTO);
         return buyOrderMapper.buyOrderToBuyOrderDTO(saveBuyOrder(buyOrder));
@@ -76,6 +79,7 @@ public class BuyOrderServiceImpl implements BuyOrderService {
 
     @Override
     @PreAuthorize(HAS_ROLE_WAREHOUSEMAN)
+    @Transactional
     public BuyOrderDTO updateBuyOrder(Long id, BuyOrderDTO buyOrderDTO) {
 
         Optional<BuyOrder> savedBuyOrderOptional = buyOrderRepository.findById(id);

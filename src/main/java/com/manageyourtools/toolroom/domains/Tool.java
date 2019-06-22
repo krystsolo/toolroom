@@ -8,7 +8,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -52,21 +54,21 @@ public class Tool {
     @Lob
     private byte[] image;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY,  mappedBy = "tool")
     @JsonIgnore
-    private List<BuyOrderTool> buyOrderTools = new ArrayList<>();
+    private Set<BuyOrderTool> buyOrderTools = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tool")
     @JsonIgnore
-    private List<DestructionOrderTool> destructionOrderTools = new ArrayList<>();
+    private Set<DestructionOrderTool> destructionOrderTools = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tool")
     @JsonIgnore
-    private List<LendingOrderTool> lendingOrderTools = new ArrayList<>();
+    private Set<LendingOrderTool> lendingOrderTools = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tool")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tool")
     @JsonIgnore
-    private List<LendingReturnOrderTool> lendingReturnOrderTools = new ArrayList<>();
+    private Set<LendingReturnOrderTool> lendingReturnOrderTools = new HashSet<>();
 
     public void addBuyOrderTool(BuyOrderTool buyOrderTool){
         buyOrderTool.setTool(this);

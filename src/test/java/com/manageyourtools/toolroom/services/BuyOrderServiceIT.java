@@ -56,7 +56,7 @@ public class BuyOrderServiceIT {
 
         toolRoomBootstrap.run();
         buyOrderService = new BuyOrderServiceImpl(buyOrderRepository, new AuthenticationFacadeImpl(),
-                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService);
+                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService, toolRepository);
     }
 
     @Test

@@ -82,11 +82,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
         Optional<Employee> employeeToUpdate = employeeRepository.findById(id);
 
-        if(!employeeToUpdate.isPresent()){
+        if (!employeeToUpdate.isPresent()){
             return saveEmployee(employeeDTO);
         }
-        if(employeeDTO.getPassword() == null || employeeDTO.getPassword().equals("")) {
+        if (employeeDTO.getPassword() == null || employeeDTO.getPassword().equals("")) {
             employeeDTO.setPassword(employeeToUpdate.get().getPassword());
+        } else {
+            employeeDTO.setPassword(bCryptPasswordEncoder.encode(employeeDTO.getPassword()));
         }
         Employee employee = employeeMapper.employeeDtoToEmployee(employeeDTO);
 
