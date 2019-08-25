@@ -45,7 +45,7 @@ public class BuyOrderServiceIT {
     @Autowired
             ToolService toolService;
 
-    BuyOrderServiceImpl buyOrderService;
+    BuyOrderService buyOrderService;
 
     @Before
     public void setUp() throws Exception {
@@ -55,8 +55,8 @@ public class BuyOrderServiceIT {
                 toolRepository, new BCryptPasswordEncoder(), buyOrderRepository, buyOrderToolRepository);
 
         toolRoomBootstrap.run();
-        buyOrderService = new BuyOrderServiceImpl(buyOrderRepository, new AuthenticationFacadeImpl(),
-                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService, toolRepository);
+        buyOrderService = new BuyOrderService(buyOrderRepository,
+                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService);
     }
 
     @Test

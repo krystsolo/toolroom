@@ -1,4 +1,4 @@
-package com.manageyourtools.toolroom.controllers;
+package com.manageyourtools.toolroom.controllers.exceptions;
 
 import com.manageyourtools.toolroom.exception.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;

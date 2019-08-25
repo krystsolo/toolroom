@@ -20,7 +20,7 @@ public class BuyOrderServiceTest {
     @Mock
     BuyOrderRepository buyOrderRepository;
 
-    BuyOrderServiceImpl buyOrderService;
+    BuyOrderService buyOrderService;
     @Mock
     EmployeeService employeeService;
 
@@ -38,8 +38,8 @@ public class BuyOrderServiceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        buyOrderService = new BuyOrderServiceImpl(buyOrderRepository, new AuthenticationFacadeImpl(),
-                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService, toolRepository);
+        buyOrderService = new BuyOrderService(buyOrderRepository,
+                employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService);
     }
 
     private BuyOrder getBuyOrder1(){

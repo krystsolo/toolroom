@@ -2,7 +2,6 @@ package com.manageyourtools.toolroom.config;
 
 import com.manageyourtools.toolroom.domains.Employee;
 import com.manageyourtools.toolroom.domains.RoleEnum;
-import com.manageyourtools.toolroom.services.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,18 +17,18 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    public static final long ACCESS_TOKEN_VALIDITY_SECONDS = 5*60*60;
-    public static final String SIGNING_KEY = "toolroom";
+    private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 5*60*60;
+    private static final String SIGNING_KEY = "toolroom";
 
-    public String getUsernameFromToken(String token) {
+    String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    public Date getExpirationDateFromToken(String token) {
+    private Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
@@ -63,7 +62,7 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (
                 username.equals(userDetails.getUsername())

@@ -32,7 +32,7 @@ public class EmployeeServiceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        employeeService = new EmployeeServiceImpl(employeeRepository, new BCryptPasswordEncoder(), new AuthenticationFacadeImpl(), new EmployeeMapperImpl());
+        employeeService = new EmployeeService(employeeRepository, new BCryptPasswordEncoder(), new AuthenticationFacadeImpl(), new EmployeeMapperImpl());
     }
 
     private List<Employee> getTestData() {

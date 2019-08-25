@@ -3,12 +3,9 @@ package com.manageyourtools.toolroom.controllers;
 import com.manageyourtools.toolroom.api.model.ToolDTO;
 
 import com.manageyourtools.toolroom.services.ToolService;
-
-import org.apache.tomcat.jni.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController

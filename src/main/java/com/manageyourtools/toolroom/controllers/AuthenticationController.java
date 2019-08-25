@@ -1,6 +1,5 @@
 package com.manageyourtools.toolroom.controllers;
 
-import com.manageyourtools.toolroom.api.mapper.EmployeeMapper;
 import com.manageyourtools.toolroom.config.JwtTokenUtil;
 import com.manageyourtools.toolroom.domains.AuthToken;
 import com.manageyourtools.toolroom.domains.Employee;
@@ -23,14 +22,12 @@ public class AuthenticationController {
     private final JwtTokenUtil jwtTokenUtil;
 
     private final EmployeeService employeeService;
-    private final EmployeeMapper employeeMapper;
 
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, EmployeeService employeeService, EmployeeMapper employeeMapper) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, EmployeeService employeeService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeeService = employeeService;
-        this.employeeMapper = employeeMapper;
     }
 
     @PostMapping(value = "/generate-token")
