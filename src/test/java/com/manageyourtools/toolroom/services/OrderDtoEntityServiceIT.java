@@ -2,9 +2,14 @@ package com.manageyourtools.toolroom.services;
 
 import com.manageyourtools.toolroom.api.mapper.BuyOrderMapperImpl;
 import com.manageyourtools.toolroom.bootstrap.ToolRoomBootstrap;
-import com.manageyourtools.toolroom.config.AuthenticationFacadeImpl;
-import com.manageyourtools.toolroom.domains.*;
-import com.manageyourtools.toolroom.repositories.*;
+import com.manageyourtools.toolroom.catalogue.domain.CategoryRepository;
+import com.manageyourtools.toolroom.employee.domain.EmployeeRepository;
+import com.manageyourtools.toolroom.employee.domain.EmployeeService;
+import com.manageyourtools.toolroom.employee.domain.RoleRepository;
+import com.manageyourtools.toolroom.lending.domain.LendingOrderToolRepository;
+import com.manageyourtools.toolroom.removing.domain.DestructionOrderToolRepository;
+import com.manageyourtools.toolroom.catalogue.domain.Tool;
+import com.manageyourtools.toolroom.catalogue.ToolRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +26,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class BuyOrderServiceIT {
+public class OrderDtoEntityServiceIT {
 
     @Autowired
     BuyOrderRepository buyOrderRepository;
@@ -41,9 +46,9 @@ public class BuyOrderServiceIT {
     BuyOrderToolRepository buyOrderToolRepository;
 
     @Autowired
-            EmployeeService employeeService;
+    EmployeeService employeeService;
     @Autowired
-            ToolService toolService;
+    ToolService toolService;
 
     BuyOrderService buyOrderService;
 

@@ -1,9 +1,15 @@
 package com.manageyourtools.toolroom.services;
 
 import com.manageyourtools.toolroom.api.mapper.BuyOrderMapperImpl;
-import com.manageyourtools.toolroom.config.AuthenticationFacadeImpl;
-import com.manageyourtools.toolroom.domains.*;
-import com.manageyourtools.toolroom.repositories.*;
+import com.manageyourtools.toolroom.catalogue.domain.UnitOfMeasure;
+import com.manageyourtools.toolroom.employee.domain.EmployeeService;
+import com.manageyourtools.toolroom.lending.domain.LendingOrderToolRepository;
+import com.manageyourtools.toolroom.removing.domain.DestructionOrderToolRepository;
+import com.manageyourtools.toolroom.catalogue.domain.Tool;
+import com.manageyourtools.toolroom.catalogue.ToolRepository;
+import com.manageyourtools.toolroom.warehouse.dto.OrderDto;
+import com.manageyourtools.toolroom.warehouse.domain.BuyOrderRepository;
+import com.manageyourtools.toolroom.warehouse.domain.BuyOrderTool;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,7 +21,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
-public class BuyOrderServiceTest {
+public class OrderDtoEntityServiceTest {
 
     @Mock
     BuyOrderRepository buyOrderRepository;
@@ -42,24 +48,24 @@ public class BuyOrderServiceTest {
                 employeeService, lendingOrderToolRepository, destructionOrderToolRepository, new BuyOrderMapperImpl(), toolService);
     }
 
-    private BuyOrder getBuyOrder1(){
-        BuyOrder buyOrder = new BuyOrder();
-        buyOrder.setAddTimestamp(Timestamp.valueOf("2018-10-10 12:22:23"));
-        buyOrder.setOrderCode("orderCode");
-        buyOrder.addBuyOrderTool(getBuyOrderTools());
-        buyOrder.setId(1L);
+    private OrderDto getBuyOrder1(){
+        OrderDto orderDto = new OrderDto();
+        orderDto.setAddTimestamp(Timestamp.valueOf("2018-10-10 12:22:23"));
+        orderDto.setOrderCode("orderCode");
+        orderDto.addBuyOrderTool(getBuyOrderTools());
+        orderDto.setId(1L);
 
-        return buyOrder;
+        return orderDto;
     }
 
-    private BuyOrder getBuyOrder2(){
-        BuyOrder buyOrder = new BuyOrder();
-        buyOrder.setAddTimestamp(Timestamp.valueOf("2018-10-10 12:22:23"));
-        buyOrder.setOrderCode("123");
-        buyOrder.addBuyOrderTool(getBuyOrderTools());
-        buyOrder.setId(1L);
+    private OrderDto getBuyOrder2(){
+        OrderDto orderDto = new OrderDto();
+        orderDto.setAddTimestamp(Timestamp.valueOf("2018-10-10 12:22:23"));
+        orderDto.setOrderCode("123");
+        orderDto.addBuyOrderTool(getBuyOrderTools());
+        orderDto.setId(1L);
 
-        return buyOrder;
+        return orderDto;
     }
 
     private BuyOrderTool getBuyOrderTools(){
@@ -109,9 +115,9 @@ public class BuyOrderServiceTest {
     /*@Test(expected = IllegalArgumentException.class)
     public void uniqueToolHasAlreadyOneCopyOnWarehouse(){
         BuyOrderTool buyOrderTool = getBuyOrderTools();
-        Tool tool = buyOrderTool.getTool();
+        Tool catalogue = buyOrderTool.getToolId();
 
-        buyOrderService.checkIfUniqueToolWillNotBeOverloaded(tool, buyOrderTool.getCount());
+        buyOrderService.checkIfUniqueToolWillNotBeOverloaded(catalogue, buyOrderTool.getCount());
     }*/
 
     @Test
@@ -159,8 +165,8 @@ public class BuyOrderServiceTest {
 
     @Test
     public void decreaseToolCountIfWasInPreviousBuyOrderTest() {
-        BuyOrder buyOrder = getBuyOrder1();
-        Set<BuyOrderTool> buyOrderTools = buyOrder.getBuyOrderTools();
+        OrderDto orderDto = getBuyOrder1();
+        Set<BuyOrderTool> buyOrderTools = orderDto.getBuyOrderTools();
         Tool tool = buyOrderTools.iterator().next().getTool();
 
         buyOrderService.decreaseToolCountIfWasInPreviousBuyOrder(buyOrderTools, tool);
@@ -173,7 +179,7 @@ public class BuyOrderServiceTest {
     public void changeBuyOrderTest() {
         BuyOrder buyOrder = getBuyOrder1();
         List<BuyOrderTool> buyOrderTools = buyOrder.getBuyOrderTools();
-        Tool tool = buyOrderTools.get(0).getTool();
+        Tool catalogue = buyOrderTools.get(0).getToolId();
 
         BuyOrder newBuyOrder = buyOrder;
         newBuyOrder.getBuyOrderTools().forEach(buyOrderTool -> buyOrderTool.setCount(103L));

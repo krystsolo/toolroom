@@ -22,6 +22,4 @@ interface ToolRepository extends Repository<Tool, Long> {
     default Tool getToolOrThrow(Long id) {
         return findById(id).orElseThrow(() -> new ResourceNotFoundException("Tool with id=" +  id + " not found"));
     }
-
-
 }

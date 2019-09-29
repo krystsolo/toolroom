@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class ToolCurrentQuantityChange {
-    Long toolId;
+    long toolId;
     long quantityChange;
 }

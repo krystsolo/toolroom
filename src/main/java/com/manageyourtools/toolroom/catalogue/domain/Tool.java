@@ -85,6 +85,8 @@ class Tool {
     void disable() {
         if (allCount.equals(INITIAL_QUANTITY)) {
             isEnable = false;
+            warrantyDate = null;
+            minimalCount = null;
 
         } else {
             throw new IllegalArgumentException("Tool can not be disabled, because there are still " + allCount + " tools in the warehouse.");
@@ -96,10 +98,29 @@ class Tool {
     }
 
     void changeAllQuantity(long quantityChange) {
+        if (!isEnable) {
+            throw new IllegalStateException("Cannot change tool all quantity because the tool is disabled");
+        }
 
+        allCount =+ quantityChange;
+        currentCount =+ quantityChange;
+        if (toolCountOnWarehouseIsBelowZero()) {
+            throw new IllegalStateException("Tool quantity cannot be below zero");
+        }
+    }
+
+    private boolean toolCountOnWarehouseIsBelowZero() {
+        return allCount < 0 || currentCount < 0;
     }
 
     void changeCurrentQuantity(long quantityChange) {
+        if (!isEnable) {
+            throw new IllegalStateException("Cannot change tool all quantity because the tool is disabled");
+        }
 
+        currentCount =+ quantityChange;
+        if (toolCountOnWarehouseIsBelowZero() || allCount < currentCount) {
+            throw new IllegalStateException("Illegal tool quantity state");
+        }
     }
 }
